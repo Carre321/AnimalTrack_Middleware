@@ -10,6 +10,8 @@ import com.tonin.animaltrack.service.VeterinarioService;
 
 public class VeterinarioServiceImpl implements VeterinarioService {
 
+    private static final String REQUIRED_DATA_MESSAGE = "Faltan datos obligatorios. Revisa los datos introducidos.";
+
     private VeterinarioDAO veterinarioDAO = null;
 
     public VeterinarioServiceImpl() {
@@ -38,9 +40,7 @@ public class VeterinarioServiceImpl implements VeterinarioService {
 
     @Override
     public VeterinarioDTO create(Veterinario veterinario) {
-        if (veterinario == null || veterinario.getCodigo() == null || veterinario.getNombre() == null || veterinario.getMunicipioId() == null) {
-            return null;
-        }
+        validateForSave(veterinario);
         Long id = veterinarioDAO.create(veterinario);
         return id == null ? null : veterinarioDAO.findById(id);
     }
@@ -48,6 +48,7 @@ public class VeterinarioServiceImpl implements VeterinarioService {
     @Override
     public void update(Veterinario veterinario) {
         if (veterinario != null && veterinario.getId() != null) {
+            validateForSave(veterinario);
             veterinarioDAO.update(veterinario);
         }
     }
@@ -55,5 +56,64 @@ public class VeterinarioServiceImpl implements VeterinarioService {
     @Override
     public void delete(Long id) {
         veterinarioDAO.delete(id);
+    }
+
+    private void validateForSave(Veterinario veterinario) {
+        if (veterinario == null) {
+            throw new IllegalArgumentException(REQUIRED_DATA_MESSAGE);
+        }
+        if (isBlank(veterinario.getCodigo())) {
+            throw new IllegalArgumentException(REQUIRED_DATA_MESSAGE);
+        }
+        if (isBlank(veterinario.getNombre())) {
+            throw new IllegalArgumentException(REQUIRED_DATA_MESSAGE);
+        }
+        if (veterinario.getMunicipioId() == null) {
+            throw new IllegalArgumentException(REQUIRED_DATA_MESSAGE);
+        }
+
+        String codigo = normalize(veterinario.getCodigo());
+        veterinario.setCodigo(codigo);
+        assertUniqueCodigo(veterinario, codigo);
+
+        String dni = normalize(veterinario.getDni());
+        veterinario.setDni(dni);
+        if (dni != null) {
+            assertUniqueDni(veterinario, dni);
+        }
+    }
+
+    private void assertUniqueCodigo(Veterinario veterinario, String codigo) {
+        VeterinarioCriteria criteria = new VeterinarioCriteria();
+        criteria.setCodigo(codigo);
+        assertNoOtherVeterinario(veterinario, veterinarioDAO.findBy(criteria));
+    }
+
+    private void assertUniqueDni(Veterinario veterinario, String dni) {
+        VeterinarioCriteria criteria = new VeterinarioCriteria();
+        criteria.setDni(dni);
+        assertNoOtherVeterinario(veterinario, veterinarioDAO.findBy(criteria));
+    }
+
+    private void assertNoOtherVeterinario(Veterinario veterinario, List<VeterinarioDTO> matches) {
+        if (matches == null) {
+            throw new IllegalStateException("No se pudo comprobar si el veterinario ya existe.");
+        }
+        for (VeterinarioDTO existing : matches) {
+            if (existing.getId() != null && !existing.getId().equals(veterinario.getId())) {
+                throw new IllegalArgumentException("No se pudo guardar el veterinario. Revisa los datos introducidos.");
+            }
+        }
+    }
+
+    private String normalize(String value) {
+        if (isBlank(value)) {
+            return null;
+        }
+        return value.trim().toUpperCase();
+    }
+
+    private boolean isBlank(String value) {
+        return value == null || value.trim().isEmpty();
     }
 }

@@ -10,6 +10,8 @@ import com.tonin.animaltrack.service.GranjaService;
 
 public class GranjaServiceImpl implements GranjaService {
 
+    private static final String REQUIRED_DATA_MESSAGE = "Faltan datos obligatorios. Revisa los datos introducidos.";
+
     private GranjaDAO granjaDAO = null;
 
     public GranjaServiceImpl() {
@@ -38,9 +40,7 @@ public class GranjaServiceImpl implements GranjaService {
 
     @Override
     public GranjaDTO create(Granja granja) {
-        if (granja == null || granja.getNombre() == null || granja.getMunicipioId() == null || granja.getGanaderoId() == null) {
-            return null;
-        }
+        validateForSave(granja);
         Long id = granjaDAO.create(granja);
         return id == null ? null : granjaDAO.findById(id);
     }
@@ -48,6 +48,7 @@ public class GranjaServiceImpl implements GranjaService {
     @Override
     public void update(Granja granja) {
         if (granja != null && granja.getId() != null) {
+            validateForSave(granja);
             granjaDAO.update(granja);
         }
     }
@@ -57,5 +58,18 @@ public class GranjaServiceImpl implements GranjaService {
         if (id != null) {
             granjaDAO.delete(id);
         }
+    }
+
+    private void validateForSave(Granja granja) {
+        if (granja == null || isBlank(granja.getNombre()) || isBlank(granja.getDireccion())
+                || granja.getMunicipioId() == null || granja.getGanaderoId() == null) {
+            throw new IllegalArgumentException(REQUIRED_DATA_MESSAGE);
+        }
+        granja.setNombre(granja.getNombre().trim());
+        granja.setDireccion(granja.getDireccion().trim());
+    }
+
+    private boolean isBlank(String value) {
+        return value == null || value.trim().isEmpty();
     }
 }
