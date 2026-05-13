@@ -6,7 +6,7 @@ import com.tonin.animaltrack.model.TipoEvento;
 
 public interface TipoEventoService {
 
-    public TipoEvento findById(Long id);
+    public TipoEvento findById(Long id) throws Exception;
 
-    public List<TipoEvento> findAll();
+    public List<TipoEvento> findAll() throws Exception;
 }

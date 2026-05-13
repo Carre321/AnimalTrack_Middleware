@@ -6,6 +6,9 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.tonin.animaltrack.dao.criteria.GranjaCriteria;
 import com.tonin.animaltrack.dao.utils.DAOUtils;
 import com.tonin.animaltrack.dao.utils.JDBCUtils;
@@ -14,6 +17,8 @@ import com.tonin.animaltrack.model.Granja;
 import com.tonin.animaltrack.model.dto.GranjaDTO;
 
 public class GranjaDAO {
+
+	private static Logger logger = LogManager.getLogger(GranjaDAO.class.getName());
 
     private static final String BASE_QUERY =
             "SELECT g.id, g.nombre, g.direccion, g.municipio_id, m.nombre, p.id, p.nombre, g.ganadero_id, " +
@@ -26,12 +31,10 @@ public class GranjaDAO {
     public GranjaDAO() {
     }
 
-    public GranjaDTO findById(Long id) {
-        Connection c = null;
+    public GranjaDTO findById(Connection c, Long id) throws Exception {
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
-            c = JDBCUtils.getConnection();
             String sql = BASE_QUERY + " WHERE g.id = ?";
             ps = c.prepareStatement(sql);
             DAOUtils.setParameters(ps, id);
@@ -40,19 +43,18 @@ public class GranjaDAO {
                 return loadNext(rs);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
+        throw e;
         } finally {
-            DAOUtils.close(rs, ps, c);
+            JDBCUtils.close(rs, ps);
         }
         return null;
     }
 
-    public List<GranjaDTO> findBy(GranjaCriteria criteria) {
-        Connection c = null;
+    public List<GranjaDTO> findBy(Connection c, GranjaCriteria criteria) throws Exception {
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
-            c = JDBCUtils.getConnection();
 
             StringBuilder sql = new StringBuilder(BASE_QUERY);
             List<String> condiciones = new ArrayList<String>();
@@ -88,29 +90,27 @@ public class GranjaDAO {
             return results;
 
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
+        throw e;
         } finally {
-            DAOUtils.close(rs, ps, c);
+            JDBCUtils.close(rs, ps);
         }
-        return null;
-    }
+        }
 
-    public List<GranjaDTO> findByGanaderoId(Long ganaderoId) {
+    public List<GranjaDTO> findByGanaderoId(Connection c, Long ganaderoId) throws Exception {
         GranjaCriteria criteria = new GranjaCriteria();
         criteria.setGanaderoId(ganaderoId);
-        return findBy(criteria);
+        return findBy(c, criteria);
     }
 
-    public List<GranjaDTO> getAll() {
-        return findBy(new GranjaCriteria());
+    public List<GranjaDTO> getAll(Connection c) throws Exception {
+        return findBy(c, new GranjaCriteria());
     }
 
-    public Long create(Granja entity) {
-        Connection c = null;
+    public Long create(Connection c, Granja entity) throws Exception {
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
-            c = JDBCUtils.getConnection();
             String sql = "INSERT INTO granja (nombre, direccion, municipio_id, ganadero_id) VALUES (?, ?, ?, ?)";
             ps = c.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
             DAOUtils.setParameters(ps, entity.getNombre(), entity.getDireccion(), entity.getMunicipioId(), entity.getGanaderoId());
@@ -120,44 +120,43 @@ public class GranjaDAO {
                 return rs.getLong(1);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
+        throw e;
         } finally {
-            DAOUtils.close(rs, ps, c);
+            JDBCUtils.close(rs, ps);
         }
         return null;
     }
 
-    public void update(Granja entity) {
-        Connection c = null;
+    public boolean update(Connection c, Granja entity) throws Exception {
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
-            c = JDBCUtils.getConnection();
             String sql = "UPDATE granja SET nombre = ?, direccion = ?, municipio_id = ?, ganadero_id = ? WHERE id = ?";
             ps = c.prepareStatement(sql);
             DAOUtils.setParameters(ps, entity.getNombre(), entity.getDireccion(), entity.getMunicipioId(), entity.getGanaderoId(), entity.getId());
-            ps.executeUpdate();
+            return ps.executeUpdate() > 0;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
+        throw e;
         } finally {
-            DAOUtils.close(rs, ps, c);
+            JDBCUtils.close(rs, ps);
         }
     }
 
-    public void delete(Long id) {
-        Connection c = null;
+    public boolean delete(Connection c, Long id) throws Exception {
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
-            c = JDBCUtils.getConnection();
             String sql = "DELETE FROM granja WHERE id = ?";
             ps = c.prepareStatement(sql);
             DAOUtils.setParameters(ps, id);
-            ps.executeUpdate();
+            return ps.executeUpdate() > 0;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
+        throw e;
         } finally {
-            DAOUtils.close(rs, ps, c);
+            JDBCUtils.close(rs, ps);
         }
     }
 

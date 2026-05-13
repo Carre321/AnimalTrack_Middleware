@@ -6,11 +6,16 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.tonin.animaltrack.dao.utils.DAOUtils;
 import com.tonin.animaltrack.dao.utils.JDBCUtils;
 import com.tonin.animaltrack.model.dto.UsuarioLoginDTO;
 
 public class UsuarioLoginDAO {
+
+	private static Logger logger = LogManager.getLogger(UsuarioLoginDAO.class.getName());
 
     private static final String BASE_QUERY =
             "SELECT ul.id, ul.email, ul.password_hash, ul.rol, ul.ganadero_id, " +
@@ -24,12 +29,10 @@ public class UsuarioLoginDAO {
     public UsuarioLoginDAO() {
     }
 
-    public UsuarioLoginDTO findById(Long id) {
-        Connection c = null;
+    public UsuarioLoginDTO findById(Connection c, Long id) throws Exception {
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
-            c = JDBCUtils.getConnection();
             ps = c.prepareStatement(BASE_QUERY + " WHERE ul.id = ?");
             DAOUtils.setParameters(ps, id);
             rs = ps.executeQuery();
@@ -37,19 +40,18 @@ public class UsuarioLoginDAO {
                 return loadNext(rs);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
+        throw e;
         } finally {
-            DAOUtils.close(rs, ps, c);
+            JDBCUtils.close(rs, ps);
         }
         return null;
     }
 
-    public UsuarioLoginDTO findByEmail(String email) {
-        Connection c = null;
+    public UsuarioLoginDTO findByEmail(Connection c, String email) throws Exception {
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
-            c = JDBCUtils.getConnection();
             ps = c.prepareStatement(BASE_QUERY + " WHERE UPPER(ul.email) = UPPER(?)");
             DAOUtils.setParameters(ps, email);
             rs = ps.executeQuery();
@@ -57,19 +59,18 @@ public class UsuarioLoginDAO {
                 return loadNext(rs);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
+        throw e;
         } finally {
-            DAOUtils.close(rs, ps, c);
+            JDBCUtils.close(rs, ps);
         }
         return null;
     }
 
-    public List<UsuarioLoginDTO> findAll() {
-        Connection c = null;
+    public List<UsuarioLoginDTO> findAll(Connection c) throws Exception {
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
-            c = JDBCUtils.getConnection();
             ps = c.prepareStatement(BASE_QUERY + " ORDER BY ul.email");
             rs = ps.executeQuery();
             List<UsuarioLoginDTO> results = new ArrayList<UsuarioLoginDTO>();
@@ -78,19 +79,17 @@ public class UsuarioLoginDAO {
             }
             return results;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
+        throw e;
         } finally {
-            DAOUtils.close(rs, ps, c);
+            JDBCUtils.close(rs, ps);
         }
-        return null;
-    }
+        }
 
-    public Long create(UsuarioLoginDTO entity) {
-        Connection c = null;
+    public Long create(Connection c, UsuarioLoginDTO entity) throws Exception {
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
-            c = JDBCUtils.getConnection();
             String sql = "INSERT INTO usuario_login (email, password_hash, rol, ganadero_id, veterinario_id, activo) VALUES (?, ?, ?, ?, ?, ?)";
             ps = c.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
             DAOUtils.setParameters(ps, entity.getEmail(), entity.getPasswordHash(), entity.getRol(), entity.getGanaderoId(),
@@ -101,44 +100,43 @@ public class UsuarioLoginDAO {
                 return rs.getLong(1);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
+        throw e;
         } finally {
-            DAOUtils.close(rs, ps, c);
+            JDBCUtils.close(rs, ps);
         }
         return null;
     }
 
-    public void update(UsuarioLoginDTO entity) {
-        Connection c = null;
+    public boolean update(Connection c, UsuarioLoginDTO entity) throws Exception {
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
-            c = JDBCUtils.getConnection();
             String sql = "UPDATE usuario_login SET email = ?, password_hash = ?, rol = ?, ganadero_id = ?, veterinario_id = ?, activo = ? WHERE id = ?";
             ps = c.prepareStatement(sql);
             DAOUtils.setParameters(ps, entity.getEmail(), entity.getPasswordHash(), entity.getRol(), entity.getGanaderoId(),
                     entity.getVeterinarioId(), entity.getActivo(), entity.getId());
-            ps.executeUpdate();
+            return ps.executeUpdate() > 0;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
+        throw e;
         } finally {
-            DAOUtils.close(rs, ps, c);
+            JDBCUtils.close(rs, ps);
         }
     }
 
-    public void delete(Long id) {
-        Connection c = null;
+    public boolean delete(Connection c, Long id) throws Exception {
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
-            c = JDBCUtils.getConnection();
             ps = c.prepareStatement("DELETE FROM usuario_login WHERE id = ?");
             DAOUtils.setParameters(ps, id);
-            ps.executeUpdate();
+            return ps.executeUpdate() > 0;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
+        throw e;
         } finally {
-            DAOUtils.close(rs, ps, c);
+            JDBCUtils.close(rs, ps);
         }
     }
 

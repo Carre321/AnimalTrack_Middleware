@@ -6,23 +6,26 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.tonin.animaltrack.dao.utils.DAOUtils;
 import com.tonin.animaltrack.dao.utils.JDBCUtils;
 import com.tonin.animaltrack.model.Dosis;
 
 public class DosisDAO {
 
+	private static Logger logger = LogManager.getLogger(DosisDAO.class.getName());
+
     private static final String BASE_QUERY = "SELECT id, plazo_siguiente, num_orden_dosis, tratamiento_id FROM dosis";
 
     public DosisDAO() {
     }
 
-    public Dosis findById(Long id) {
-        Connection c = null;
+    public Dosis findById(Connection c, Long id) throws Exception {
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
-            c = JDBCUtils.getConnection();
             String sql = BASE_QUERY + " WHERE id = ?";
             ps = c.prepareStatement(sql);
             DAOUtils.setParameters(ps, id);
@@ -31,20 +34,19 @@ public class DosisDAO {
                 return loadNext(rs);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
+        throw e;
         } finally {
-            DAOUtils.close(rs, ps, c);
+            JDBCUtils.close(rs, ps);
         }
         return null;
     }
 
-    public List<Dosis> findByTratamientoId(Long tratamientoId) {
-        Connection c = null;
+    public List<Dosis> findByTratamientoId(Connection c, Long tratamientoId) throws Exception {
         PreparedStatement ps = null;
         ResultSet rs = null;
         List<Dosis> results = new ArrayList<Dosis>();
         try {
-            c = JDBCUtils.getConnection();
             String sql = BASE_QUERY + " WHERE tratamiento_id = ? ORDER BY num_orden_dosis";
             ps = c.prepareStatement(sql);
             DAOUtils.setParameters(ps, tratamientoId);
@@ -53,20 +55,19 @@ public class DosisDAO {
                 results.add(loadNext(rs));
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
+        throw e;
         } finally {
-            DAOUtils.close(rs, ps, c);
+            JDBCUtils.close(rs, ps);
         }
         return results;
     }
 
-    public List<Dosis> getAll() {
-        Connection c = null;
+    public List<Dosis> getAll(Connection c) throws Exception {
         PreparedStatement ps = null;
         ResultSet rs = null;
         List<Dosis> results = new ArrayList<Dosis>();
         try {
-            c = JDBCUtils.getConnection();
             String sql = BASE_QUERY + " ORDER BY id";
             ps = c.prepareStatement(sql);
             rs = ps.executeQuery();
@@ -74,19 +75,18 @@ public class DosisDAO {
                 results.add(loadNext(rs));
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
+        throw e;
         } finally {
-            DAOUtils.close(rs, ps, c);
+            JDBCUtils.close(rs, ps);
         }
         return results;
     }
 
-    public Long create(Dosis entity) {
-        Connection c = null;
+    public Long create(Connection c, Dosis entity) throws Exception {
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
-            c = JDBCUtils.getConnection();
             String sql = "INSERT INTO dosis (plazo_siguiente, num_orden_dosis, tratamiento_id) VALUES (?, ?, ?)";
             ps = c.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
             DAOUtils.setParameters(ps, entity.getPlazoSiguiente(), entity.getNumOrdenDosis(), entity.getTratamientoId());
@@ -96,44 +96,43 @@ public class DosisDAO {
                 return rs.getLong(1);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
+        throw e;
         } finally {
-            DAOUtils.close(rs, ps, c);
+            JDBCUtils.close(rs, ps);
         }
         return null;
     }
 
-    public void update(Dosis entity) {
-        Connection c = null;
+    public boolean update(Connection c, Dosis entity) throws Exception {
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
-            c = JDBCUtils.getConnection();
             String sql = "UPDATE dosis SET plazo_siguiente = ?, num_orden_dosis = ?, tratamiento_id = ? WHERE id = ?";
             ps = c.prepareStatement(sql);
             DAOUtils.setParameters(ps, entity.getPlazoSiguiente(), entity.getNumOrdenDosis(), entity.getTratamientoId(), entity.getId());
-            ps.executeUpdate();
+            return ps.executeUpdate() > 0;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
+        throw e;
         } finally {
-            DAOUtils.close(rs, ps, c);
+            JDBCUtils.close(rs, ps);
         }
     }
 
-    public void delete(Long id) {
-        Connection c = null;
+    public boolean delete(Connection c, Long id) throws Exception {
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
-            c = JDBCUtils.getConnection();
             String sql = "DELETE FROM dosis WHERE id = ?";
             ps = c.prepareStatement(sql);
             DAOUtils.setParameters(ps, id);
-            ps.executeUpdate();
+            return ps.executeUpdate() > 0;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
+        throw e;
         } finally {
-            DAOUtils.close(rs, ps, c);
+            JDBCUtils.close(rs, ps);
         }
     }
 

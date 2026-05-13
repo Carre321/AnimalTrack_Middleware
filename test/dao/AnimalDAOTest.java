@@ -1,11 +1,13 @@
 package dao;
 
 import java.sql.Date;
+import java.sql.Connection;
 import java.util.List;
 
 import com.tonin.animaltrack.dao.AnimalDAO;
 import com.tonin.animaltrack.dao.Results;
 import com.tonin.animaltrack.dao.criteria.AnimalCriteria;
+import com.tonin.animaltrack.dao.utils.JDBCUtils;
 import com.tonin.animaltrack.model.Animal;
 import com.tonin.animaltrack.model.dto.AnimalDTO;
 import com.tonin.animaltrack.service.AnimalService;
@@ -17,16 +19,29 @@ public class AnimalDAOTest {
 	private static AnimalDAO dao = new AnimalDAO();
 	private static AnimalService service = new AnimalServiceImpl();
 
-	public static final void testFindById() {
-		AnimalDTO a = dao.findById(1L);
-		System.out.println(a);
+	public static final void testFindById() throws Exception {
+		Connection c = null;
+		boolean commit = false;
+		try {
+			c = openConnection();
+			AnimalDTO a = dao.findById(c, 1L);
+			commit = true;
+			System.out.println(a);
+		} finally {
+			JDBCUtils.close(c, commit);
+		}
 	}
 
-	public static final void testFindBy() {
+	public static final void testFindBy() throws Exception {
+		Connection c = null;
+		boolean commit = false;
+		try {
+			c = openConnection();
 		AnimalCriteria criteria = new AnimalCriteria();
 		criteria.setGranjaId(1L);
 		criteria.setCrotalLike("ES270");
-		Results<AnimalDTO> results = dao.findBy(criteria, 1, Integer.MAX_VALUE);
+		Results<AnimalDTO> results = dao.findBy(c, criteria, 1, Integer.MAX_VALUE);
+		commit = true;
 		List<AnimalDTO> resultados = results == null ? null : results.getPageResults();
 		if (resultados == null) {
 			return;
@@ -34,9 +49,16 @@ public class AnimalDAOTest {
 		for (AnimalDTO a : resultados) {
 			System.out.println(a);
 		}
+		} finally {
+			JDBCUtils.close(c, commit);
+		}
 	}
 
-	public static final void testCreate() {
+	public static final void testCreate() throws Exception {
+		Connection c = null;
+		boolean commit = false;
+		try {
+			c = openConnection();
 		Animal a = new Animal();
 		a.setNombre("PRUEBA");
 		a.setCrotal("TEST-" + System.currentTimeMillis());
@@ -44,16 +66,24 @@ public class AnimalDAOTest {
 		a.setFechaBaja(null);
 		a.setGranjaId(1L);
 		a.setSexoId(2L);
-		createdId = dao.create(a);
+		createdId = dao.create(c, a);
+		commit = true;
 		System.out.println("ID " + createdId);
+		} finally {
+			JDBCUtils.close(c, commit);
+		}
 	}
 
-	public static final void testUpdate() {
+	public static final void testUpdate() throws Exception {
 		if (createdId == null) {
 			System.out.println("No hay ID creado");
 			return;
 		}
-		AnimalDTO dto = dao.findById(createdId);
+		Connection c = null;
+		boolean commit = false;
+		try {
+			c = openConnection();
+		AnimalDTO dto = dao.findById(c, createdId);
 		if (dto == null) {
 			System.out.println("No existe");
 			return;
@@ -71,21 +101,33 @@ public class AnimalDAOTest {
 		a.setMadreExternaCrotal(dto.getMadreExternaCrotal());
 		a.setPadreInternoId(dto.getPadreInternoId());
 		a.setEventPartoId(dto.getEventPartoId());
-		dao.update(a);
-		System.out.println(dao.findById(createdId));
+		dao.update(c, a);
+		commit = true;
+		System.out.println(dao.findById(c, createdId));
+		} finally {
+			JDBCUtils.close(c, commit);
+		}
 	}
 
-	public static void deleteTest() {
+	public static void deleteTest() throws Exception {
 		if (createdId == null) {
 			System.out.println("No hay ID creado");
 			return;
 		}
-		dao.delete(createdId);
+		Connection c = null;
+		boolean commit = false;
+		try {
+			c = openConnection();
+		dao.delete(c, createdId);
+		commit = true;
 		System.out.println("Deleted " + createdId);
 		createdId = null;
+		} finally {
+			JDBCUtils.close(c, commit);
+		}
 	}
 
-	public static void testPagedFindBy() {
+	public static void testPagedFindBy() throws Exception {
 		AnimalCriteria criteria = new AnimalCriteria();
 		int pageSize = 10;
 		Results<AnimalDTO> results = null;
@@ -99,6 +141,12 @@ public class AnimalDAOTest {
 		} while (resultsPage != null && resultsPage.size()==pageSize);
 	}
 
+	private static Connection openConnection() throws Exception {
+		Connection c = JDBCUtils.getConnection();
+		c.setAutoCommit(false);
+		return c;
+	}
+
 	private static void print(List<AnimalDTO> resultsPage) {
 		System.out.println("Imprimiendo paginas...");
 		if (resultsPage == null) {
@@ -110,7 +158,7 @@ public class AnimalDAOTest {
 		
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		//testFindById();
 		testPagedFindBy();
 		//testCreate();

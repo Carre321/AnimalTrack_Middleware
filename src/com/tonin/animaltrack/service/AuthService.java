@@ -4,7 +4,7 @@ import com.tonin.animaltrack.model.dto.UsuarioLoginDTO;
 
 public interface AuthService {
 
-    UsuarioLoginDTO login(String email, String password);
+    UsuarioLoginDTO login(String email, String password) throws Exception;
 
-    UsuarioLoginDTO findByEmail(String email);
+    UsuarioLoginDTO findByEmail(String email) throws Exception;
 }

@@ -6,7 +6,7 @@ import com.tonin.animaltrack.model.TipoNotificacion;
 
 public interface TipoNotificacionService {
 
-    public TipoNotificacion findById(Long id);
+    public TipoNotificacion findById(Long id) throws Exception;
 
-    public List<TipoNotificacion> findAll();
+    public List<TipoNotificacion> findAll() throws Exception;
 }

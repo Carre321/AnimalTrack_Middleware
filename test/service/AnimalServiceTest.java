@@ -18,12 +18,12 @@ public class AnimalServiceTest {
         this.service = new AnimalServiceImpl();
     }
 
-    public void testFindById(Long id) {
+    public void testFindById(Long id) throws Exception {
         AnimalDTO dto = service.findById(id);
         System.out.println(dto);
     }
 
-    public void testFindBy() {
+    public void testFindBy() throws Exception {
         AnimalCriteria criteria = new AnimalCriteria();
         criteria.setGranjaId(1L);
         criteria.setCrotalLike("ES270");
@@ -33,7 +33,7 @@ public class AnimalServiceTest {
         }
     }
 
-    public void testCreate() {
+    public void testCreate() throws Exception {
         Animal a = new Animal();
         a.setNombre("SERVICE-ANIMAL");
         a.setCrotal("SV-AN-" + System.currentTimeMillis());
@@ -45,7 +45,7 @@ public class AnimalServiceTest {
         System.out.println("Created " + created);
     }
 
-    public void testUpdate() {
+    public void testUpdate() throws Exception {
         if (created == null || created.getId() == null) {
             System.out.println("No hay ID creado");
             return;
@@ -72,7 +72,7 @@ public class AnimalServiceTest {
         System.out.println(service.findById(created.getId()));
     }
 
-    public void deleteTest() {
+    public void deleteTest() throws Exception {
         if (created == null || created.getId() == null) {
             System.out.println("No hay ID creado");
             return;
@@ -82,7 +82,7 @@ public class AnimalServiceTest {
         created = null;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         AnimalServiceTest test = new AnimalServiceTest();
 //      test.testFindById(1L);
       test.testFindBy();

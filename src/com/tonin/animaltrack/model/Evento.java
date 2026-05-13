@@ -1,5 +1,6 @@
 package com.tonin.animaltrack.model;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public class Evento extends AbstractValueObject {
@@ -10,9 +11,11 @@ public class Evento extends AbstractValueObject {
     private Long veterinarioId;
     private LocalDateTime fechaHora;
     private Long semillaId;
-    private Integer precioEvento;
+    private BigDecimal precioEvento;
     private Long dosisId;
     private Long tratamientoId;
+    private String resultado;
+    private String observaciones;
 
     public Evento() {
     }
@@ -65,11 +68,11 @@ public class Evento extends AbstractValueObject {
         this.semillaId = semillaId;
     }
 
-    public Integer getPrecioEvento() {
+    public BigDecimal getPrecioEvento() {
         return precioEvento;
     }
 
-    public void setPrecioEvento(Integer precioEvento) {
+    public void setPrecioEvento(BigDecimal precioEvento) {
         this.precioEvento = precioEvento;
     }
 
@@ -87,6 +90,22 @@ public class Evento extends AbstractValueObject {
 
     public void setTratamientoId(Long tratamientoId) {
         this.tratamientoId = tratamientoId;
+    }
+
+    public String getResultado() {
+        return resultado;
+    }
+
+    public void setResultado(String resultado) {
+        this.resultado = resultado;
+    }
+
+    public String getObservaciones() {
+        return observaciones;
+    }
+
+    public void setObservaciones(String observaciones) {
+        this.observaciones = observaciones;
     }
 }
 

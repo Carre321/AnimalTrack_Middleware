@@ -1,14 +1,21 @@
 package com.tonin.animaltrack.service.impl;
 
+import java.sql.Connection;
 import java.util.List;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.tonin.animaltrack.dao.VeterinarioDAO;
 import com.tonin.animaltrack.dao.criteria.VeterinarioCriteria;
+import com.tonin.animaltrack.dao.utils.JDBCUtils;
 import com.tonin.animaltrack.model.Veterinario;
 import com.tonin.animaltrack.model.dto.VeterinarioDTO;
 import com.tonin.animaltrack.service.VeterinarioService;
 
 public class VeterinarioServiceImpl implements VeterinarioService {
+
+    private static Logger logger = LogManager.getLogger(VeterinarioServiceImpl.class.getName());
 
     private static final String REQUIRED_DATA_MESSAGE = "Faltan datos obligatorios. Revisa los datos introducidos.";
 
@@ -19,46 +26,135 @@ public class VeterinarioServiceImpl implements VeterinarioService {
     }
 
     @Override
-    public VeterinarioDTO findById(Long id) {
-        return veterinarioDAO.findById(id);
-    }
-
-    @Override
-    public List<VeterinarioDTO> findByCriteria(VeterinarioCriteria criteria) {
-        return veterinarioDAO.findBy(criteria);
-    }
-
-    @Override
-    public List<VeterinarioDTO> findByMunicipioId(Long municipioId) {
-        return veterinarioDAO.findByMunicipioId(municipioId);
-    }
-
-    @Override
-    public List<VeterinarioDTO> findAll() {
-        return veterinarioDAO.getAll();
-    }
-
-    @Override
-    public VeterinarioDTO create(Veterinario veterinario) {
-        validateForSave(veterinario);
-        Long id = veterinarioDAO.create(veterinario);
-        return id == null ? null : veterinarioDAO.findById(id);
-    }
-
-    @Override
-    public void update(Veterinario veterinario) {
-        if (veterinario != null && veterinario.getId() != null) {
-            validateForSave(veterinario);
-            veterinarioDAO.update(veterinario);
+    public VeterinarioDTO findById(Long id) throws Exception {
+        Connection c = null;
+        boolean commit = false;
+        try {
+            c = JDBCUtils.getConnection();
+            c.setAutoCommit(false);
+            VeterinarioDTO result = veterinarioDAO.findById(c, id);
+            commit = true;
+            return result;
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            throw e;
+        } finally {
+            JDBCUtils.close(c, commit);
         }
     }
 
     @Override
-    public void delete(Long id) {
-        veterinarioDAO.delete(id);
+    public List<VeterinarioDTO> findByCriteria(VeterinarioCriteria criteria) throws Exception {
+        Connection c = null;
+        boolean commit = false;
+        try {
+            c = JDBCUtils.getConnection();
+            c.setAutoCommit(false);
+            List<VeterinarioDTO> result = veterinarioDAO.findBy(c, criteria);
+            commit = true;
+            return result;
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            throw e;
+        } finally {
+            JDBCUtils.close(c, commit);
+        }
     }
 
-    private void validateForSave(Veterinario veterinario) {
+    @Override
+    public List<VeterinarioDTO> findByMunicipioId(Long municipioId) throws Exception {
+        Connection c = null;
+        boolean commit = false;
+        try {
+            c = JDBCUtils.getConnection();
+            c.setAutoCommit(false);
+            List<VeterinarioDTO> result = veterinarioDAO.findByMunicipioId(c, municipioId);
+            commit = true;
+            return result;
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            throw e;
+        } finally {
+            JDBCUtils.close(c, commit);
+        }
+    }
+
+    @Override
+    public List<VeterinarioDTO> findAll() throws Exception {
+        Connection c = null;
+        boolean commit = false;
+        try {
+            c = JDBCUtils.getConnection();
+            c.setAutoCommit(false);
+            List<VeterinarioDTO> result = veterinarioDAO.getAll(c);
+            commit = true;
+            return result;
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            throw e;
+        } finally {
+            JDBCUtils.close(c, commit);
+        }
+    }
+
+    @Override
+    public VeterinarioDTO create(Veterinario veterinario) throws Exception {
+        Connection c = null;
+        boolean commit = false;
+        try {
+            c = JDBCUtils.getConnection();
+            c.setAutoCommit(false);
+            validateForSave(c, veterinario);
+            Long id = veterinarioDAO.create(c, veterinario);
+            VeterinarioDTO result = id == null ? null : veterinarioDAO.findById(c, id);
+            commit = true;
+            return result;
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            throw e;
+        } finally {
+            JDBCUtils.close(c, commit);
+        }
+    }
+
+    @Override
+    public void update(Veterinario veterinario) throws Exception {
+        Connection c = null;
+        boolean commit = false;
+        try {
+            c = JDBCUtils.getConnection();
+            c.setAutoCommit(false);
+            if (veterinario != null && veterinario.getId() != null) {
+                validateForSave(c, veterinario);
+                veterinarioDAO.update(c, veterinario);
+            }
+            commit = true;
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            throw e;
+        } finally {
+            JDBCUtils.close(c, commit);
+        }
+    }
+
+    @Override
+    public void delete(Long id) throws Exception {
+        Connection c = null;
+        boolean commit = false;
+        try {
+            c = JDBCUtils.getConnection();
+            c.setAutoCommit(false);
+            veterinarioDAO.delete(c, id);
+            commit = true;
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            throw e;
+        } finally {
+            JDBCUtils.close(c, commit);
+        }
+    }
+
+    private void validateForSave(Connection c, Veterinario veterinario) throws Exception {
         if (veterinario == null) {
             throw new IllegalArgumentException(REQUIRED_DATA_MESSAGE);
         }
@@ -74,25 +170,25 @@ public class VeterinarioServiceImpl implements VeterinarioService {
 
         String codigo = normalize(veterinario.getCodigo());
         veterinario.setCodigo(codigo);
-        assertUniqueCodigo(veterinario, codigo);
+        assertUniqueCodigo(c, veterinario, codigo);
 
         String dni = normalize(veterinario.getDni());
         veterinario.setDni(dni);
         if (dni != null) {
-            assertUniqueDni(veterinario, dni);
+            assertUniqueDni(c, veterinario, dni);
         }
     }
 
-    private void assertUniqueCodigo(Veterinario veterinario, String codigo) {
+    private void assertUniqueCodigo(Connection c, Veterinario veterinario, String codigo) throws Exception {
         VeterinarioCriteria criteria = new VeterinarioCriteria();
         criteria.setCodigo(codigo);
-        assertNoOtherVeterinario(veterinario, veterinarioDAO.findBy(criteria));
+        assertNoOtherVeterinario(veterinario, veterinarioDAO.findBy(c, criteria));
     }
 
-    private void assertUniqueDni(Veterinario veterinario, String dni) {
+    private void assertUniqueDni(Connection c, Veterinario veterinario, String dni) throws Exception {
         VeterinarioCriteria criteria = new VeterinarioCriteria();
         criteria.setDni(dni);
-        assertNoOtherVeterinario(veterinario, veterinarioDAO.findBy(criteria));
+        assertNoOtherVeterinario(veterinario, veterinarioDAO.findBy(c, criteria));
     }
 
     private void assertNoOtherVeterinario(Veterinario veterinario, List<VeterinarioDTO> matches) {

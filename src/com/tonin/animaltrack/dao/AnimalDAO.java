@@ -18,7 +18,7 @@ import com.tonin.animaltrack.model.dto.AnimalDTO;
 
 public class AnimalDAO {
 
-	private static Logger Logger = LogManager.getLogger(AnimalDAO.class.getName());
+	private static Logger logger = LogManager.getLogger(AnimalDAO.class.getName());
 
 	private static final String BASE_QUERY =
 			"SELECT a.id, a.crotal, a.nombre, a.fecha_nacimiento, a.fecha_baja, a.granja_id, g.nombre, a.sexo_id, s.nombre, " +
@@ -32,12 +32,10 @@ public class AnimalDAO {
 	public AnimalDAO() {
 	}
 
-	public AnimalDTO findById(Long id) {
-		Connection c = null;
+	public AnimalDTO findById(Connection c, Long id) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		try {
-			c = JDBCUtils.getConnection();
 
 			StringBuilder sql = new StringBuilder(BASE_QUERY);
 			sql.append(" WHERE a.id = ? ");
@@ -51,19 +49,17 @@ public class AnimalDAO {
 			}
 			return null;
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
+			throw e;
 		} finally {
-			DAOUtils.close(rs, ps, c);
+			JDBCUtils.close(rs, ps);
 		}
-		return null;
 	}
 
-	public AnimalDTO findByCrotal(String crotal) {
-		Connection c = null;
+	public AnimalDTO findByCrotal(Connection c, String crotal) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		try {
-			c = JDBCUtils.getConnection();
 
 			StringBuilder sql = new StringBuilder(BASE_QUERY);
 			sql.append(" WHERE a.crotal = ? ");
@@ -77,25 +73,23 @@ public class AnimalDAO {
 			}
 			return null;
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
+			throw e;
 		} finally {
-			DAOUtils.close(rs, ps, c);
+			JDBCUtils.close(rs, ps);
 		}
-		return null;
 	}
 
-	public Results<AnimalDTO> findBy(AnimalCriteria criteria, int from, int pageSize) {
+	public Results<AnimalDTO> findBy(Connection c, AnimalCriteria criteria, int from, int pageSize) throws Exception {
 
 
-		if (Logger.isInfoEnabled()) {
-			Logger.info("Criteria: {}", criteria); //Muy importante usarlos de esta manera para evitar problemas de rendimiento al usar el +. ("Criteria" +  criteria)
+		if (logger.isInfoEnabled()) {
+			logger.info("Criteria: {}", criteria); //Muy importante usarlos de esta manera para evitar problemas de rendimiento al usar el +. ("Criteria" +  criteria)
 		}
 
-		Connection c = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		try {
-			c = JDBCUtils.getConnection();
 
 			StringBuilder sql = new StringBuilder(BASE_QUERY);
 
@@ -124,10 +118,10 @@ public class AnimalDAO {
 
 			sql.append(" ORDER BY ").append(criteria.getOrderby()).append(criteria.isAscDesc() ? " ASC " : " DESC ");
 
-			Logger.info("SQL: {}", sql);
+			logger.info("SQL: {}", sql);
 
-			//            if (Logger.isInfoEnabled()) {
-			//				Logger.info("Criteria SQL: {}: {}:", criteria, sql);
+			//            if (logger.isInfoEnabled()) {
+			//				logger.info("Criteria SQL: {}: {}:", criteria, sql);
 			//			}
 
 			ps = c.prepareStatement(sql.toString(), ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
@@ -159,19 +153,17 @@ public class AnimalDAO {
 			return results;
 
 		} catch (Exception e) {
-			Logger.error(e.getMessage()+ ":" +criteria, e);
+			logger.error(e.getMessage()+ ":" +criteria, e);
+			throw e;
 		} finally {
-			DAOUtils.close(rs, ps, c);
+			JDBCUtils.close(rs, ps);
 		}
-		return null;
 	}
 
-	public Long create(Animal a) {
-		Connection c = null;
+	public Long create(Connection c, Animal a) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		try {
-			c = JDBCUtils.getConnection();
 
 			StringBuilder sql = new StringBuilder();
 			sql.append("INSERT INTO animal (nombre, crotal, fecha_nacimiento, fecha_baja, granja_id, raza_id, sexo_id, ");
@@ -200,19 +192,18 @@ public class AnimalDAO {
 				return rs.getLong(1);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
+			throw e;
 		} finally {
-			DAOUtils.close(rs, ps, c);
+			JDBCUtils.close(rs, ps);
 		}
 		return null;
 	}
 
-	public void update(Animal a) {
-		Connection c = null;
+	public boolean update(Connection c, Animal a) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		try {
-			c = JDBCUtils.getConnection();
 
 			StringBuilder sql = new StringBuilder();
 			sql.append("UPDATE animal SET nombre = ?, crotal = ?, fecha_nacimiento = ?, fecha_baja = ?, granja_id = ?, raza_id = ?, sexo_id = ?, ");
@@ -235,32 +226,32 @@ public class AnimalDAO {
 					a.getEventPartoId(),
 					a.getId());
 
-			ps.executeUpdate();
+			return ps.executeUpdate() > 0;
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
+			throw e;
 		} finally {
-			DAOUtils.close(rs, ps, c);
+			JDBCUtils.close(rs, ps);
 		}
 	}
 
-	public void delete(Long id) {
-		Connection c = null;
+	public boolean delete(Connection c, Long id) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		try {
-			c = JDBCUtils.getConnection();
 
 			String sql = "DELETE FROM animal WHERE id = ?";
 			ps = c.prepareStatement(sql);
 
 			DAOUtils.setParameters(ps, id);
-			ps.executeUpdate();
+			return ps.executeUpdate() > 0;
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
+			throw e;
 		} finally {
-			DAOUtils.close(rs, ps, c);
+			JDBCUtils.close(rs, ps);
 		}
 	}
 

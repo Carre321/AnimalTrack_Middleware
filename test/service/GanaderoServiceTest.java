@@ -17,12 +17,12 @@ public class GanaderoServiceTest {
         this.service = new GanaderoServiceImpl();
     }
 
-    public void testFindById(Long id) {
+    public void testFindById(Long id) throws Exception {
         GanaderoDTO dto = service.findById(id);
         System.out.println(dto);
     }
 
-    public void testFindBy() {
+    public void testFindBy() throws Exception {
         GanaderoCriteria criteria = new GanaderoCriteria();
         criteria.setMunicipioId(1L);
         List<GanaderoDTO> resultados = service.findByCriteria(criteria);
@@ -31,7 +31,7 @@ public class GanaderoServiceTest {
         }
     }
 
-    public void testCreate() {
+    public void testCreate() throws Exception {
         Ganadero g = new Ganadero();
         g.setDni("99999999X");
         g.setNombre("TEST");
@@ -43,7 +43,7 @@ public class GanaderoServiceTest {
         System.out.println("Created " + created);
     }
 
-    public void testUpdate() {
+    public void testUpdate() throws Exception {
         if (created == null || created.getId() == null) {
             System.out.println("No hay ID creado");
             return;
@@ -60,7 +60,7 @@ public class GanaderoServiceTest {
         System.out.println(service.findById(created.getId()));
     }
 
-    public void deleteTest() {
+    public void deleteTest() throws Exception {
         if (created == null || created.getId() == null) {
             System.out.println("No hay ID creado");
             return;
@@ -70,7 +70,7 @@ public class GanaderoServiceTest {
         created = null;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         GanaderoServiceTest test = new GanaderoServiceTest();
         test.testFindById(1L);
 //      test.testFindBy();

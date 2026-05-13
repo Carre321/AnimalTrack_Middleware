@@ -6,23 +6,26 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.tonin.animaltrack.dao.utils.DAOUtils;
 import com.tonin.animaltrack.dao.utils.JDBCUtils;
 import com.tonin.animaltrack.model.Semilla;
 
 public class SemillaDAO {
 
+	private static Logger logger = LogManager.getLogger(SemillaDAO.class.getName());
+
     private static final String BASE_QUERY = "SELECT id, codigo, descripcion FROM semilla";
 
     public SemillaDAO() {
     }
 
-    public Semilla findById(Long id) {
-        Connection c = null;
+    public Semilla findById(Connection c, Long id) throws Exception {
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
-            c = JDBCUtils.getConnection();
             String sql = BASE_QUERY + " WHERE id = ?";
             ps = c.prepareStatement(sql);
             DAOUtils.setParameters(ps, id);
@@ -31,19 +34,18 @@ public class SemillaDAO {
                 return loadNext(rs);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
+        throw e;
         } finally {
-            DAOUtils.close(rs, ps, c);
+            JDBCUtils.close(rs, ps);
         }
         return null;
     }
 
-    public Semilla findByCodigo(String codigo) {
-        Connection c = null;
+    public Semilla findByCodigo(Connection c, String codigo) throws Exception {
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
-            c = JDBCUtils.getConnection();
             String sql = BASE_QUERY + " WHERE codigo = ?";
             ps = c.prepareStatement(sql);
             DAOUtils.setParameters(ps, codigo);
@@ -52,20 +54,19 @@ public class SemillaDAO {
                 return loadNext(rs);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
+        throw e;
         } finally {
-            DAOUtils.close(rs, ps, c);
+            JDBCUtils.close(rs, ps);
         }
         return null;
     }
 
-    public List<Semilla> getAll() {
-        Connection c = null;
+    public List<Semilla> getAll(Connection c) throws Exception {
         PreparedStatement ps = null;
         ResultSet rs = null;
         List<Semilla> results = new ArrayList<Semilla>();
         try {
-            c = JDBCUtils.getConnection();
             String sql = BASE_QUERY + " ORDER BY codigo";
             ps = c.prepareStatement(sql);
             rs = ps.executeQuery();
@@ -73,19 +74,18 @@ public class SemillaDAO {
                 results.add(loadNext(rs));
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
+        throw e;
         } finally {
-            DAOUtils.close(rs, ps, c);
+            JDBCUtils.close(rs, ps);
         }
         return results;
     }
 
-    public Long create(Semilla entity) {
-        Connection c = null;
+    public Long create(Connection c, Semilla entity) throws Exception {
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
-            c = JDBCUtils.getConnection();
             String sql = "INSERT INTO semilla (codigo, descripcion) VALUES (?, ?)";
             ps = c.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
             DAOUtils.setParameters(ps, entity.getCodigo(), entity.getDescripcion());
@@ -95,44 +95,43 @@ public class SemillaDAO {
                 return rs.getLong(1);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
+        throw e;
         } finally {
-            DAOUtils.close(rs, ps, c);
+            JDBCUtils.close(rs, ps);
         }
         return null;
     }
 
-    public void update(Semilla entity) {
-        Connection c = null;
+    public boolean update(Connection c, Semilla entity) throws Exception {
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
-            c = JDBCUtils.getConnection();
             String sql = "UPDATE semilla SET codigo = ?, descripcion = ? WHERE id = ?";
             ps = c.prepareStatement(sql);
             DAOUtils.setParameters(ps, entity.getCodigo(), entity.getDescripcion(), entity.getId());
-            ps.executeUpdate();
+            return ps.executeUpdate() > 0;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
+        throw e;
         } finally {
-            DAOUtils.close(rs, ps, c);
+            JDBCUtils.close(rs, ps);
         }
     }
 
-    public void delete(Long id) {
-        Connection c = null;
+    public boolean delete(Connection c, Long id) throws Exception {
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
-            c = JDBCUtils.getConnection();
             String sql = "DELETE FROM semilla WHERE id = ?";
             ps = c.prepareStatement(sql);
             DAOUtils.setParameters(ps, id);
-            ps.executeUpdate();
+            return ps.executeUpdate() > 0;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
+        throw e;
         } finally {
-            DAOUtils.close(rs, ps, c);
+            JDBCUtils.close(rs, ps);
         }
     }
 

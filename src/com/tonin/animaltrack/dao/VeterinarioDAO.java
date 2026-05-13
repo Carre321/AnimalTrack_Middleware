@@ -6,6 +6,9 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.tonin.animaltrack.dao.criteria.VeterinarioCriteria;
 import com.tonin.animaltrack.dao.utils.DAOUtils;
 import com.tonin.animaltrack.dao.utils.JDBCUtils;
@@ -14,6 +17,8 @@ import com.tonin.animaltrack.model.Veterinario;
 import com.tonin.animaltrack.model.dto.VeterinarioDTO;
 
 public class VeterinarioDAO {
+
+	private static Logger logger = LogManager.getLogger(VeterinarioDAO.class.getName());
 
     private static final String BASE_QUERY =
             "SELECT v.id, v.codigo, v.dni, v.nombre, v.apellidos, v.telefono, v.email, v.municipio_id, m.nombre, p.id, p.nombre " +
@@ -24,12 +29,10 @@ public class VeterinarioDAO {
     public VeterinarioDAO() {
     }
 
-    public VeterinarioDTO findById(Long id) {
-        Connection c = null;
+    public VeterinarioDTO findById(Connection c, Long id) throws Exception {
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
-            c = JDBCUtils.getConnection();
             String sql = BASE_QUERY + " WHERE v.id = ?";
             ps = c.prepareStatement(sql);
             DAOUtils.setParameters(ps, id);
@@ -38,19 +41,18 @@ public class VeterinarioDAO {
                 return loadNext(rs);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
+        throw e;
         } finally {
-            DAOUtils.close(rs, ps, c);
+            JDBCUtils.close(rs, ps);
         }
         return null;
     }
 
-    public List<VeterinarioDTO> findBy(VeterinarioCriteria criteria) {
-        Connection c = null;
+    public List<VeterinarioDTO> findBy(Connection c, VeterinarioCriteria criteria) throws Exception {
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
-            c = JDBCUtils.getConnection();
 
             StringBuilder sql = new StringBuilder(BASE_QUERY);
             if (criteria.getGranjaId() != null) {
@@ -102,29 +104,27 @@ public class VeterinarioDAO {
             return results;
 
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
+        throw e;
         } finally {
-            DAOUtils.close(rs, ps, c);
+            JDBCUtils.close(rs, ps);
         }
-        return null;
-    }
+        }
 
-    public List<VeterinarioDTO> findByMunicipioId(Long municipioId) {
+    public List<VeterinarioDTO> findByMunicipioId(Connection c, Long municipioId) throws Exception {
         VeterinarioCriteria criteria = new VeterinarioCriteria();
         criteria.setMunicipioId(municipioId);
-        return findBy(criteria);
+        return findBy(c, criteria);
     }
 
-    public List<VeterinarioDTO> getAll() {
-        return findBy(new VeterinarioCriteria());
+    public List<VeterinarioDTO> getAll(Connection c) throws Exception {
+        return findBy(c, new VeterinarioCriteria());
     }
 
-    public Long create(Veterinario entity) {
-        Connection c = null;
+    public Long create(Connection c, Veterinario entity) throws Exception {
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
-            c = JDBCUtils.getConnection();
             String sql = "INSERT INTO veterinario (codigo, dni, nombre, apellidos, telefono, email, municipio_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
             ps = c.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
             DAOUtils.setParameters(ps, entity.getCodigo(), entity.getDni(), entity.getNombre(), entity.getApellidos(), entity.getTelefono(), entity.getEmail(), entity.getMunicipioId());
@@ -134,44 +134,43 @@ public class VeterinarioDAO {
                 return rs.getLong(1);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
+        throw e;
         } finally {
-            DAOUtils.close(rs, ps, c);
+            JDBCUtils.close(rs, ps);
         }
         return null;
     }
 
-    public void update(Veterinario entity) {
-        Connection c = null;
+    public boolean update(Connection c, Veterinario entity) throws Exception {
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
-            c = JDBCUtils.getConnection();
             String sql = "UPDATE veterinario SET codigo = ?, dni = ?, nombre = ?, apellidos = ?, telefono = ?, email = ?, municipio_id = ? WHERE id = ?";
             ps = c.prepareStatement(sql);
             DAOUtils.setParameters(ps, entity.getCodigo(), entity.getDni(), entity.getNombre(), entity.getApellidos(), entity.getTelefono(), entity.getEmail(), entity.getMunicipioId(), entity.getId());
-            ps.executeUpdate();
+            return ps.executeUpdate() > 0;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
+        throw e;
         } finally {
-            DAOUtils.close(rs, ps, c);
+            JDBCUtils.close(rs, ps);
         }
     }
 
-    public void delete(Long id) {
-        Connection c = null;
+    public boolean delete(Connection c, Long id) throws Exception {
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
-            c = JDBCUtils.getConnection();
             String sql = "DELETE FROM veterinario WHERE id = ?";
             ps = c.prepareStatement(sql);
             DAOUtils.setParameters(ps, id);
-            ps.executeUpdate();
+            return ps.executeUpdate() > 0;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
+        throw e;
         } finally {
-            DAOUtils.close(rs, ps, c);
+            JDBCUtils.close(rs, ps);
         }
     }
 

@@ -8,17 +8,17 @@ import com.tonin.animaltrack.model.dto.GranjaDTO;
 
 public interface GranjaService {
 
-    public GranjaDTO findById(Long id);
+    public GranjaDTO findById(Long id) throws Exception;
 
-    public List<GranjaDTO> findByCriteria(GranjaCriteria criteria);
+    public List<GranjaDTO> findByCriteria(GranjaCriteria criteria) throws Exception;
 
-    public List<GranjaDTO> findByGanaderoId(Long ganaderoId);
+    public List<GranjaDTO> findByGanaderoId(Long ganaderoId) throws Exception;
 
-    public List<GranjaDTO> findAll();
+    public List<GranjaDTO> findAll() throws Exception;
 
-    public GranjaDTO create(Granja granja);
+    public GranjaDTO create(Granja granja) throws Exception;
 
-    public void update(Granja granja);
+    public void update(Granja granja) throws Exception;
 
-    public void delete(Long id);
+    public void delete(Long id) throws Exception;
 }

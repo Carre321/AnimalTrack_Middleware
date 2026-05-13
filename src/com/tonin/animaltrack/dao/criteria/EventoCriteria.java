@@ -1,5 +1,6 @@
 package com.tonin.animaltrack.dao.criteria;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public class EventoCriteria {
@@ -10,14 +11,16 @@ public class EventoCriteria {
     private String animalNombreLike;
     private String animalCrotalLike;
     private Long tipoEventoId;
+    private String tipoEventoCodigo;
     private String tipoEventoNombreLike;
     private Long veterinarioId;
     private String veterinarioNombreLike;
     private Long semillaId;
-    private Integer precioEventoDesde;
-    private Integer precioEventoHasta;
+    private BigDecimal precioEventoDesde;
+    private BigDecimal precioEventoHasta;
     private Long dosisId;
     private Long tratamientoId;
+    private String resultado;
     private LocalDateTime fechaDesde;
     private LocalDateTime fechaHasta;
 
@@ -72,6 +75,14 @@ public class EventoCriteria {
         this.tipoEventoId = tipoEventoId;
     }
 
+    public String getTipoEventoCodigo() {
+        return tipoEventoCodigo;
+    }
+
+    public void setTipoEventoCodigo(String tipoEventoCodigo) {
+        this.tipoEventoCodigo = tipoEventoCodigo;
+    }
+
     public String getTipoEventoNombreLike() {
         return tipoEventoNombreLike;
     }
@@ -104,19 +115,19 @@ public class EventoCriteria {
         this.semillaId = semillaId;
     }
 
-    public Integer getPrecioEventoDesde() {
+    public BigDecimal getPrecioEventoDesde() {
         return precioEventoDesde;
     }
 
-    public void setPrecioEventoDesde(Integer precioEventoDesde) {
+    public void setPrecioEventoDesde(BigDecimal precioEventoDesde) {
         this.precioEventoDesde = precioEventoDesde;
     }
 
-    public Integer getPrecioEventoHasta() {
+    public BigDecimal getPrecioEventoHasta() {
         return precioEventoHasta;
     }
 
-    public void setPrecioEventoHasta(Integer precioEventoHasta) {
+    public void setPrecioEventoHasta(BigDecimal precioEventoHasta) {
         this.precioEventoHasta = precioEventoHasta;
     }
 
@@ -134,6 +145,14 @@ public class EventoCriteria {
 
     public void setTratamientoId(Long tratamientoId) {
         this.tratamientoId = tratamientoId;
+    }
+
+    public String getResultado() {
+        return resultado;
+    }
+
+    public void setResultado(String resultado) {
+        this.resultado = resultado;
     }
 
     public LocalDateTime getFechaDesde() {

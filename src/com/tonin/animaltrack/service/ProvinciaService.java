@@ -6,7 +6,7 @@ import com.tonin.animaltrack.model.Provincia;
 
 public interface ProvinciaService {
 
-    public Provincia findById(Long id);
+    public Provincia findById(Long id) throws Exception;
 
-    public List<Provincia> findAll();
+    public List<Provincia> findAll() throws Exception;
 }

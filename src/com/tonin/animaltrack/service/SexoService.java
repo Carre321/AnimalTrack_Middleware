@@ -6,7 +6,7 @@ import com.tonin.animaltrack.model.Sexo;
 
 public interface SexoService {
 
-    public Sexo findById(Long id);
+    public Sexo findById(Long id) throws Exception;
 
-    public List<Sexo> findAll();
+    public List<Sexo> findAll() throws Exception;
 }

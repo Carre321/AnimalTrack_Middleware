@@ -6,23 +6,26 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.tonin.animaltrack.dao.utils.DAOUtils;
 import com.tonin.animaltrack.dao.utils.JDBCUtils;
 import com.tonin.animaltrack.model.Municipio;
 
 public class MunicipioDAO {
 
+	private static Logger logger = LogManager.getLogger(MunicipioDAO.class.getName());
+
     private static final String BASE_QUERY = "SELECT id, nombre, provincia_id FROM municipio";
 
     public MunicipioDAO() {
     }
 
-    public Municipio findById(Long id) {
-        Connection c = null;
+    public Municipio findById(Connection c, Long id) throws Exception {
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
-            c = JDBCUtils.getConnection();
             String sql = BASE_QUERY + " WHERE id = ?";
             ps = c.prepareStatement(sql);
             DAOUtils.setParameters(ps, id);
@@ -31,20 +34,19 @@ public class MunicipioDAO {
                 return loadNext(rs);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
+        throw e;
         } finally {
-            DAOUtils.close(rs, ps, c);
+            JDBCUtils.close(rs, ps);
         }
         return null;
     }
 
-    public List<Municipio> findByProvinciaId(Long provinciaId) {
-        Connection c = null;
+    public List<Municipio> findByProvinciaId(Connection c, Long provinciaId) throws Exception {
         PreparedStatement ps = null;
         ResultSet rs = null;
         List<Municipio> results = new ArrayList<Municipio>();
         try {
-            c = JDBCUtils.getConnection();
             String sql = BASE_QUERY + " WHERE provincia_id = ? ORDER BY nombre";
             ps = c.prepareStatement(sql);
             DAOUtils.setParameters(ps, provinciaId);
@@ -53,20 +55,19 @@ public class MunicipioDAO {
                 results.add(loadNext(rs));
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
+        throw e;
         } finally {
-            DAOUtils.close(rs, ps, c);
+            JDBCUtils.close(rs, ps);
         }
         return results;
     }
 
-    public List<Municipio> getAll() {
-        Connection c = null;
+    public List<Municipio> getAll(Connection c) throws Exception {
         PreparedStatement ps = null;
         ResultSet rs = null;
         List<Municipio> results = new ArrayList<Municipio>();
         try {
-            c = JDBCUtils.getConnection();
             String sql = BASE_QUERY + " ORDER BY nombre";
             ps = c.prepareStatement(sql);
             rs = ps.executeQuery();
@@ -74,9 +75,10 @@ public class MunicipioDAO {
                 results.add(loadNext(rs));
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
+        throw e;
         } finally {
-            DAOUtils.close(rs, ps, c);
+            JDBCUtils.close(rs, ps);
         }
         return results;
     }

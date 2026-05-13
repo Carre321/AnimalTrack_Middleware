@@ -1,5 +1,6 @@
 package service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -18,12 +19,12 @@ public class EventoServiceTest {
         this.service = new EventoServiceImpl();
     }
 
-    public void testFindById(Long id) {
+    public void testFindById(Long id) throws Exception {
         EventoDTO dto = service.findById(id);
         System.out.println(dto);
     }
 
-    public void testFindBy() {
+    public void testFindBy() throws Exception {
         EventoCriteria criteria = new EventoCriteria();
         criteria.setAnimalId(1L);
         List<EventoDTO> resultados = service.findByCriteria(criteria);
@@ -32,7 +33,7 @@ public class EventoServiceTest {
         }
     }
 
-    public void testCreate() {
+    public void testCreate() throws Exception {
         Evento e = new Evento();
         e.setAnimalId(1L);
         e.setTipoEventoId(1L);
@@ -41,7 +42,7 @@ public class EventoServiceTest {
         System.out.println("Created " + created);
     }
 
-    public void testUpdate() {
+    public void testUpdate() throws Exception {
         if (created == null || created.getId() == null) {
             System.out.println("No hay ID creado");
             return;
@@ -58,14 +59,14 @@ public class EventoServiceTest {
         e.setVeterinarioId(dto.getVeterinarioId());
         e.setFechaHora(dto.getFechaHora());
         e.setSemillaId(dto.getSemillaId());
-        e.setPrecioEvento(88);
+        e.setPrecioEvento(new BigDecimal("88"));
         e.setDosisId(dto.getDosisId());
         e.setTratamientoId(dto.getTratamientoId());
         service.update(e);
         System.out.println(service.findById(created.getId()));
     }
 
-    public void deleteTest() {
+    public void deleteTest() throws Exception {
         if (created == null || created.getId() == null) {
             System.out.println("No hay ID creado");
             return;
@@ -75,7 +76,7 @@ public class EventoServiceTest {
         created = null;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         EventoServiceTest test = new EventoServiceTest();
         test.testFindById(1L);
 //      test.testFindBy();

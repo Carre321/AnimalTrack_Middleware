@@ -7,6 +7,9 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.tonin.animaltrack.dao.criteria.NotificacionCriteria;
 import com.tonin.animaltrack.dao.utils.DAOUtils;
 import com.tonin.animaltrack.dao.utils.JDBCUtils;
@@ -15,6 +18,8 @@ import com.tonin.animaltrack.model.Notificacion;
 import com.tonin.animaltrack.model.dto.NotificacionDTO;
 
 public class NotificacionDAO {
+
+	private static Logger logger = LogManager.getLogger(NotificacionDAO.class.getName());
 
     private static final String BASE_QUERY =
             "SELECT n.id, n.evento_id, n.tipo, n.fecha_emision, n.descripcion, n.tipo_notificacion_id, tn.nombre, " +
@@ -28,12 +33,10 @@ public class NotificacionDAO {
     public NotificacionDAO() {
     }
 
-    public NotificacionDTO findById(Long id) {
-        Connection c = null;
+    public NotificacionDTO findById(Connection c, Long id) throws Exception {
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
-            c = JDBCUtils.getConnection();
             String sql = BASE_QUERY + " WHERE n.id = ?";
             ps = c.prepareStatement(sql);
             DAOUtils.setParameters(ps, id);
@@ -42,19 +45,18 @@ public class NotificacionDAO {
                 return loadNext(rs);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
+        throw e;
         } finally {
-            DAOUtils.close(rs, ps, c);
+            JDBCUtils.close(rs, ps);
         }
         return null;
     }
 
-    public List<NotificacionDTO> findBy(NotificacionCriteria criteria) {
-        Connection c = null;
+    public List<NotificacionDTO> findBy(Connection c, NotificacionCriteria criteria) throws Exception {
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
-            c = JDBCUtils.getConnection();
 
             StringBuilder sql = new StringBuilder(BASE_QUERY);
             List<String> condiciones = new ArrayList<String>();
@@ -93,29 +95,27 @@ public class NotificacionDAO {
             return results;
 
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
+        throw e;
         } finally {
-            DAOUtils.close(rs, ps, c);
+            JDBCUtils.close(rs, ps);
         }
-        return null;
-    }
+        }
 
-    public List<NotificacionDTO> findByEventoId(Long eventoId) {
+    public List<NotificacionDTO> findByEventoId(Connection c, Long eventoId) throws Exception {
         NotificacionCriteria criteria = new NotificacionCriteria();
         criteria.setEventoId(eventoId);
-        return findBy(criteria);
+        return findBy(c, criteria);
     }
 
-    public List<NotificacionDTO> getAll() {
-        return findBy(new NotificacionCriteria());
+    public List<NotificacionDTO> getAll(Connection c) throws Exception {
+        return findBy(c, new NotificacionCriteria());
     }
 
-    public Long create(Notificacion entity) {
-        Connection c = null;
+    public Long create(Connection c, Notificacion entity) throws Exception {
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
-            c = JDBCUtils.getConnection();
             String sql = "INSERT INTO notificacion (evento_id, tipo, fecha_emision, descripcion, tipo_notificacion_id) VALUES (?, ?, ?, ?, ?)";
             ps = c.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
             Timestamp ts = entity.getFechaEmision() == null ? null : Timestamp.valueOf(entity.getFechaEmision());
@@ -126,45 +126,44 @@ public class NotificacionDAO {
                 return rs.getLong(1);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
+        throw e;
         } finally {
-            DAOUtils.close(rs, ps, c);
+            JDBCUtils.close(rs, ps);
         }
         return null;
     }
 
-    public void update(Notificacion entity) {
-        Connection c = null;
+    public boolean update(Connection c, Notificacion entity) throws Exception {
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
-            c = JDBCUtils.getConnection();
             String sql = "UPDATE notificacion SET evento_id = ?, tipo = ?, fecha_emision = ?, descripcion = ?, tipo_notificacion_id = ? WHERE id = ?";
             ps = c.prepareStatement(sql);
             Timestamp ts = entity.getFechaEmision() == null ? null : Timestamp.valueOf(entity.getFechaEmision());
             DAOUtils.setParameters(ps, entity.getEventoId(), entity.getTipo(), ts, entity.getDescripcion(), entity.getTipoNotificacionId(), entity.getId());
-            ps.executeUpdate();
+            return ps.executeUpdate() > 0;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
+        throw e;
         } finally {
-            DAOUtils.close(rs, ps, c);
+            JDBCUtils.close(rs, ps);
         }
     }
 
-    public void delete(Long id) {
-        Connection c = null;
+    public boolean delete(Connection c, Long id) throws Exception {
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
-            c = JDBCUtils.getConnection();
             String sql = "DELETE FROM notificacion WHERE id = ?";
             ps = c.prepareStatement(sql);
             DAOUtils.setParameters(ps, id);
-            ps.executeUpdate();
+            return ps.executeUpdate() > 0;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
+        throw e;
         } finally {
-            DAOUtils.close(rs, ps, c);
+            JDBCUtils.close(rs, ps);
         }
     }
 

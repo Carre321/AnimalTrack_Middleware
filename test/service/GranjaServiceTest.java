@@ -17,12 +17,12 @@ public class GranjaServiceTest {
         this.service = new GranjaServiceImpl();
     }
 
-    public void testFindById(Long id) {
+    public void testFindById(Long id) throws Exception {
         GranjaDTO dto = service.findById(id);
         System.out.println(dto);
     }
 
-    public void testFindBy() {
+    public void testFindBy() throws Exception {
         GranjaCriteria criteria = new GranjaCriteria();
         criteria.setGanaderoId(1L);
         List<GranjaDTO> resultados = service.findByCriteria(criteria);
@@ -31,7 +31,7 @@ public class GranjaServiceTest {
         }
     }
 
-    public void testCreate() {
+    public void testCreate() throws Exception {
         Granja g = new Granja();
         g.setNombre("TEST-GRANJA-" + System.currentTimeMillis());
         g.setDireccion("Direccion de prueba");
@@ -41,7 +41,7 @@ public class GranjaServiceTest {
         System.out.println("Created " + created);
     }
 
-    public void testUpdate() {
+    public void testUpdate() throws Exception {
         if (created == null || created.getId() == null) {
             System.out.println("No hay ID creado");
             return;
@@ -56,7 +56,7 @@ public class GranjaServiceTest {
         System.out.println(service.findById(created.getId()));
     }
 
-    public void deleteTest() {
+    public void deleteTest() throws Exception {
         if (created == null || created.getId() == null) {
             System.out.println("No hay ID creado");
             return;
@@ -66,7 +66,7 @@ public class GranjaServiceTest {
         created = null;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         GranjaServiceTest test = new GranjaServiceTest();
         test.testFindById(1L);
 //      test.testFindBy();

@@ -6,15 +6,15 @@ import com.tonin.animaltrack.model.dto.UsuarioLoginDTO;
 
 public interface UsuarioLoginService {
 
-    UsuarioLoginDTO findById(Long id);
+    UsuarioLoginDTO findById(Long id) throws Exception;
 
-    UsuarioLoginDTO findByEmail(String email);
+    UsuarioLoginDTO findByEmail(String email) throws Exception;
 
-    List<UsuarioLoginDTO> findAll();
+    List<UsuarioLoginDTO> findAll() throws Exception;
 
-    UsuarioLoginDTO create(UsuarioLoginDTO usuario);
+    UsuarioLoginDTO create(UsuarioLoginDTO usuario) throws Exception;
 
-    void update(UsuarioLoginDTO usuario);
+    void update(UsuarioLoginDTO usuario) throws Exception;
 
-    void delete(Long id);
+    void delete(Long id) throws Exception;
 }

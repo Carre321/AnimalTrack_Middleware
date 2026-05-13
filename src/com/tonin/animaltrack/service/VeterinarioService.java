@@ -8,17 +8,17 @@ import com.tonin.animaltrack.model.dto.VeterinarioDTO;
 
 public interface VeterinarioService {
 
-    public VeterinarioDTO findById(Long id);
+    public VeterinarioDTO findById(Long id) throws Exception;
 
-    public List<VeterinarioDTO> findByCriteria(VeterinarioCriteria criteria);
+    public List<VeterinarioDTO> findByCriteria(VeterinarioCriteria criteria) throws Exception;
 
-    public List<VeterinarioDTO> findByMunicipioId(Long municipioId);
+    public List<VeterinarioDTO> findByMunicipioId(Long municipioId) throws Exception;
 
-    public List<VeterinarioDTO> findAll();
+    public List<VeterinarioDTO> findAll() throws Exception;
 
-    public VeterinarioDTO create(Veterinario veterinario);
+    public VeterinarioDTO create(Veterinario veterinario) throws Exception;
 
-    public void update(Veterinario veterinario);
+    public void update(Veterinario veterinario) throws Exception;
 
-    public void delete(Long id);
+    public void delete(Long id) throws Exception;
 }

@@ -9,20 +9,20 @@ import com.tonin.animaltrack.model.dto.AnimalDTO;
 
 public interface AnimalService {
 
-    public AnimalDTO findById(Long id);
+    public AnimalDTO findById(Long id) throws Exception;
 
-    public AnimalDTO findByCrotal(String crotal);
+    public AnimalDTO findByCrotal(String crotal) throws Exception;
 
-    public List<AnimalDTO> findByCriteria(AnimalCriteria criteria);
+    public List<AnimalDTO> findByCriteria(AnimalCriteria criteria) throws Exception;
     
-    public List<AnimalDTO> findAll();
+    public List<AnimalDTO> findAll() throws Exception;
 
-    public AnimalDTO create(Animal animal);
+    public AnimalDTO create(Animal animal) throws Exception;
 
-    public void update(Animal animal);
+    public boolean update(Animal animal) throws Exception;
 
-    public void delete(Long id);
+    public boolean delete(Long id) throws Exception;
 
-	Results<AnimalDTO> findByCriteria(AnimalCriteria criteria, int from, int pageSize);
+	Results<AnimalDTO> findByCriteria(AnimalCriteria criteria, int from, int pageSize) throws Exception;
 
 }

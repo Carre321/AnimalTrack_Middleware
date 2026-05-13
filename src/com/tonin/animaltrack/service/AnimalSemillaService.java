@@ -6,13 +6,13 @@ import com.tonin.animaltrack.model.AnimalSemilla;
 
 public interface AnimalSemillaService {
 
-    public List<AnimalSemilla> findByAnimalId(Long animalId);
+    public List<AnimalSemilla> findByAnimalId(Long animalId) throws Exception;
 
-    public List<AnimalSemilla> findBySemillaId(Long semillaId);
+    public List<AnimalSemilla> findBySemillaId(Long semillaId) throws Exception;
 
-    public AnimalSemilla create(AnimalSemilla animalSemilla);
+    public AnimalSemilla create(AnimalSemilla animalSemilla) throws Exception;
 
-    public void update(Long oldAnimalId, Long oldSemillaId, AnimalSemilla animalSemilla);
+    public void update(Long oldAnimalId, Long oldSemillaId, AnimalSemilla animalSemilla) throws Exception;
 
-    public void delete(Long animalId, Long semillaId);
+    public void delete(Long animalId, Long semillaId) throws Exception;
 }

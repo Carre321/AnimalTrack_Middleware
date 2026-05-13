@@ -1,10 +1,13 @@
 package dao;
 
+import java.math.BigDecimal;
+import java.sql.Connection;
 import java.time.LocalDateTime;
 import java.util.List;
 
 import com.tonin.animaltrack.dao.EventoDAO;
 import com.tonin.animaltrack.dao.criteria.EventoCriteria;
+import com.tonin.animaltrack.dao.utils.JDBCUtils;
 import com.tonin.animaltrack.model.Evento;
 import com.tonin.animaltrack.model.dto.EventoDTO;
 
@@ -13,35 +16,63 @@ public class EventoDAOTest {
 	private static EventoDAO dao = new EventoDAO();
 	private static Long createdId = null;
 
-	public static final void testFindById() {
-		EventoDTO dto = dao.findById(1L);
-		System.out.println(dto);
-	}
-
-	public static final void testFindBy() {
-		EventoCriteria criteria = new EventoCriteria();
-		criteria.setAnimalId(1L);
-		List<EventoDTO> resultados = dao.findBy(criteria);
-		for (EventoDTO dto : resultados) {
+	public static final void testFindById() throws Exception {
+		Connection c = null;
+		boolean commit = false;
+		try {
+			c = openConnection();
+			EventoDTO dto = dao.findById(c, 1L);
+			commit = true;
 			System.out.println(dto);
+		} finally {
+			JDBCUtils.close(c, commit);
 		}
 	}
 
-	public static final void testCreate() {
+	public static final void testFindBy() throws Exception {
+		Connection c = null;
+		boolean commit = false;
+		try {
+			c = openConnection();
+		EventoCriteria criteria = new EventoCriteria();
+		criteria.setAnimalId(1L);
+		List<EventoDTO> resultados = dao.findBy(c, criteria);
+		commit = true;
+		for (EventoDTO dto : resultados) {
+			System.out.println(dto);
+		}
+		} finally {
+			JDBCUtils.close(c, commit);
+		}
+	}
+
+	public static final void testCreate() throws Exception {
+		Connection c = null;
+		boolean commit = false;
+		try {
+			c = openConnection();
 		Evento e = new Evento();
 		e.setAnimalId(1L);
 		e.setTipoEventoId(1L);
 		e.setFechaHora(LocalDateTime.now());
-		createdId = dao.create(e);
+		createdId = dao.create(c, e);
+		commit = true;
 		System.out.println("ID " + createdId);
+		} finally {
+			JDBCUtils.close(c, commit);
+		}
 	}
 
-	public static final void testUpdate() {
+	public static final void testUpdate() throws Exception {
 		if (createdId == null) {
 			System.out.println("No hay ID creado");
 			return;
 		}
-		EventoDTO dto = dao.findById(createdId);
+		Connection c = null;
+		boolean commit = false;
+		try {
+			c = openConnection();
+		EventoDTO dto = dao.findById(c, createdId);
 		if (dto == null) {
 			System.out.println("No existe");
 			return;
@@ -53,24 +84,42 @@ public class EventoDAOTest {
 		e.setVeterinarioId(dto.getVeterinarioId());
 		e.setFechaHora(dto.getFechaHora());
 		e.setSemillaId(dto.getSemillaId());
-		e.setPrecioEvento(99);
+		e.setPrecioEvento(new BigDecimal("99"));
 		e.setDosisId(dto.getDosisId());
 		e.setTratamientoId(dto.getTratamientoId());
-		dao.update(e);
-		System.out.println(dao.findById(dto.getId()));
+		dao.update(c, e);
+		commit = true;
+		System.out.println(dao.findById(c, dto.getId()));
+		} finally {
+			JDBCUtils.close(c, commit);
+		}
 	}
 
-	public static void deleteTest() {
+	public static void deleteTest() throws Exception {
 		if (createdId == null) {
 			System.out.println("No hay ID creado");
 			return;
 		}
-		dao.delete(createdId);
+		Connection c = null;
+		boolean commit = false;
+		try {
+			c = openConnection();
+		dao.delete(c, createdId);
+		commit = true;
 		System.out.println("Deleted " + createdId);
 		createdId = null;
+		} finally {
+			JDBCUtils.close(c, commit);
+		}
 	}
 
-	public static void main(String[] args) {
+	private static Connection openConnection() throws Exception {
+		Connection c = JDBCUtils.getConnection();
+		c.setAutoCommit(false);
+		return c;
+	}
+
+	public static void main(String[] args) throws Exception {
 		//testFindById();
 		//testFindBy();
 		testCreate();

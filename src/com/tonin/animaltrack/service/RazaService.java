@@ -6,7 +6,7 @@ import com.tonin.animaltrack.model.Raza;
 
 public interface RazaService {
 
-    public Raza findById(Long id);
+    public Raza findById(Long id) throws Exception;
 
-    public List<Raza> findAll();
+    public List<Raza> findAll() throws Exception;
 }

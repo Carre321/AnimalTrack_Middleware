@@ -6,15 +6,15 @@ import com.tonin.animaltrack.model.Semilla;
 
 public interface SemillaService {
 
-    public Semilla findById(Long id);
+    public Semilla findById(Long id) throws Exception;
 
-    public Semilla findByCodigo(String codigo);
+    public Semilla findByCodigo(String codigo) throws Exception;
 
-    public List<Semilla> findAll();
+    public List<Semilla> findAll() throws Exception;
 
-    public Semilla create(Semilla semilla);
+    public Semilla create(Semilla semilla) throws Exception;
 
-    public void update(Semilla semilla);
+    public void update(Semilla semilla) throws Exception;
 
-    public void delete(Long id);
+    public void delete(Long id) throws Exception;
 }

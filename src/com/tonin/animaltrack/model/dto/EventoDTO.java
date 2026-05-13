@@ -1,5 +1,6 @@
 package com.tonin.animaltrack.model.dto;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import com.tonin.animaltrack.model.AbstractValueObject;
@@ -12,6 +13,7 @@ public class EventoDTO extends AbstractValueObject {
     private String animalNombre;
 
     private Long tipoEventoId;
+    private String tipoEventoCodigo;
     private String tipoEventoNombre;
 
     private Long veterinarioId;
@@ -22,13 +24,15 @@ public class EventoDTO extends AbstractValueObject {
     private Long semillaId;
     private String semillaCodigo;
 
-    private Integer precioEvento;
+    private BigDecimal precioEvento;
 
     private Long dosisId;
     private Integer dosisNumOrden;
 
     private Long tratamientoId;
     private String tratamientoNombre;
+    private String resultado;
+    private String observaciones;
 
     public EventoDTO() {
     }
@@ -77,6 +81,14 @@ public class EventoDTO extends AbstractValueObject {
         return tipoEventoNombre;
     }
 
+    public String getTipoEventoCodigo() {
+        return tipoEventoCodigo;
+    }
+
+    public void setTipoEventoCodigo(String tipoEventoCodigo) {
+        this.tipoEventoCodigo = tipoEventoCodigo;
+    }
+
     public void setTipoEventoNombre(String tipoEventoNombre) {
         this.tipoEventoNombre = tipoEventoNombre;
     }
@@ -121,11 +133,11 @@ public class EventoDTO extends AbstractValueObject {
         this.semillaCodigo = semillaCodigo;
     }
 
-    public Integer getPrecioEvento() {
+    public BigDecimal getPrecioEvento() {
         return precioEvento;
     }
 
-    public void setPrecioEvento(Integer precioEvento) {
+    public void setPrecioEvento(BigDecimal precioEvento) {
         this.precioEvento = precioEvento;
     }
 
@@ -159,6 +171,22 @@ public class EventoDTO extends AbstractValueObject {
 
     public void setTratamientoNombre(String tratamientoNombre) {
         this.tratamientoNombre = tratamientoNombre;
+    }
+
+    public String getResultado() {
+        return resultado;
+    }
+
+    public void setResultado(String resultado) {
+        this.resultado = resultado;
+    }
+
+    public String getObservaciones() {
+        return observaciones;
+    }
+
+    public void setObservaciones(String observaciones) {
+        this.observaciones = observaciones;
     }
 
 }
