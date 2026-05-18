@@ -21,7 +21,7 @@ public class VeterinarioDAO {
 	private static Logger logger = LogManager.getLogger(VeterinarioDAO.class.getName());
 
     private static final String BASE_QUERY =
-            "SELECT v.id, v.codigo, v.dni, v.nombre, v.apellidos, v.telefono, v.email, v.municipio_id, m.nombre, p.id, p.nombre " +
+            "SELECT v.id, v.codigo, v.dni, v.nombre, v.apellidos, v.telefono, v.email, v.direccion, v.codigo_postal, v.municipio_id, m.nombre, p.id, p.nombre " +
             "FROM veterinario v " +
             "INNER JOIN municipio m ON v.municipio_id = m.id " +
             "INNER JOIN provincia p ON m.provincia_id = p.id ";
@@ -125,9 +125,9 @@ public class VeterinarioDAO {
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
-            String sql = "INSERT INTO veterinario (codigo, dni, nombre, apellidos, telefono, email, municipio_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO veterinario (codigo, dni, nombre, apellidos, telefono, email, direccion, codigo_postal, municipio_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
             ps = c.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
-            DAOUtils.setParameters(ps, entity.getCodigo(), entity.getDni(), entity.getNombre(), entity.getApellidos(), entity.getTelefono(), entity.getEmail(), entity.getMunicipioId());
+            DAOUtils.setParameters(ps, entity.getCodigo(), entity.getDni(), entity.getNombre(), entity.getApellidos(), entity.getTelefono(), entity.getEmail(), entity.getDireccion(), entity.getCodigoPostal(), entity.getMunicipioId());
             ps.executeUpdate();
             rs = ps.getGeneratedKeys();
             if (rs.next()) {
@@ -146,9 +146,9 @@ public class VeterinarioDAO {
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
-            String sql = "UPDATE veterinario SET codigo = ?, dni = ?, nombre = ?, apellidos = ?, telefono = ?, email = ?, municipio_id = ? WHERE id = ?";
+            String sql = "UPDATE veterinario SET codigo = ?, dni = ?, nombre = ?, apellidos = ?, telefono = ?, email = ?, direccion = ?, codigo_postal = ?, municipio_id = ? WHERE id = ?";
             ps = c.prepareStatement(sql);
-            DAOUtils.setParameters(ps, entity.getCodigo(), entity.getDni(), entity.getNombre(), entity.getApellidos(), entity.getTelefono(), entity.getEmail(), entity.getMunicipioId(), entity.getId());
+            DAOUtils.setParameters(ps, entity.getCodigo(), entity.getDni(), entity.getNombre(), entity.getApellidos(), entity.getTelefono(), entity.getEmail(), entity.getDireccion(), entity.getCodigoPostal(), entity.getMunicipioId(), entity.getId());
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
@@ -184,6 +184,8 @@ public class VeterinarioDAO {
         dto.setApellidos(rs.getString(i++));
         dto.setTelefono(rs.getString(i++));
         dto.setEmail(rs.getString(i++));
+        dto.setDireccion(rs.getString(i++));
+        dto.setCodigoPostal(rs.getString(i++));
         dto.setMunicipioId(rs.getLong(i++));
         dto.setMunicipioNombre(rs.getString(i++));
         dto.setProvinciaId(rs.getLong(i++));

@@ -7,6 +7,7 @@ public class GranjaDTO extends AbstractValueObject {
     private Long id;
     private String nombre;
     private String direccion;
+    private String codigoPostal;
 
     private Long municipioId;
     private String municipioNombre;
@@ -42,6 +43,14 @@ public class GranjaDTO extends AbstractValueObject {
 
     public void setDireccion(String direccion) {
         this.direccion = direccion;
+    }
+
+    public String getCodigoPostal() {
+        return codigoPostal;
+    }
+
+    public void setCodigoPostal(String codigoPostal) {
+        this.codigoPostal = codigoPostal;
     }
 
     public Long getMunicipioId() {

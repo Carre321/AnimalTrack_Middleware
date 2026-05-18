@@ -10,6 +10,8 @@ public class GanaderoDTO extends AbstractValueObject {
     private String apellidos;
     private String telefono;
     private String email;
+    private String direccion;
+    private String codigoPostal;
 
     private Long municipioId;
     private String municipioNombre;
@@ -66,6 +68,22 @@ public class GanaderoDTO extends AbstractValueObject {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getDireccion() {
+        return direccion;
+    }
+
+    public void setDireccion(String direccion) {
+        this.direccion = direccion;
+    }
+
+    public String getCodigoPostal() {
+        return codigoPostal;
+    }
+
+    public void setCodigoPostal(String codigoPostal) {
+        this.codigoPostal = codigoPostal;
     }
 
     public Long getMunicipioId() {

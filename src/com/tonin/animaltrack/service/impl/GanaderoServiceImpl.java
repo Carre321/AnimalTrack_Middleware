@@ -172,6 +172,8 @@ public class GanaderoServiceImpl implements GanaderoService {
             throw new IllegalArgumentException(REQUIRED_DATA_MESSAGE);
         }
         ganadero.setDni(dni);
+        ganadero.setDireccion(normalize(ganadero.getDireccion()));
+        ganadero.setCodigoPostal(normalize(ganadero.getCodigoPostal()));
 
         GanaderoCriteria criteria = new GanaderoCriteria();
         criteria.setDni(dni);
@@ -191,6 +193,10 @@ public class GanaderoServiceImpl implements GanaderoService {
             return null;
         }
         return dni.trim().toUpperCase();
+    }
+
+    private String normalize(String value) {
+        return isBlank(value) ? null : value.trim();
     }
 
     private boolean isBlank(String value) {

@@ -163,6 +163,11 @@ public class GranjaServiceImpl implements GranjaService {
         }
         granja.setNombre(granja.getNombre().trim());
         granja.setDireccion(granja.getDireccion().trim());
+        granja.setCodigoPostal(normalize(granja.getCodigoPostal()));
+    }
+
+    private String normalize(String value) {
+        return isBlank(value) ? null : value.trim();
     }
 
     private boolean isBlank(String value) {

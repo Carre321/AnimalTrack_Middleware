@@ -170,6 +170,8 @@ public class VeterinarioServiceImpl implements VeterinarioService {
 
         String codigo = normalize(veterinario.getCodigo());
         veterinario.setCodigo(codigo);
+        veterinario.setDireccion(normalize(veterinario.getDireccion()));
+        veterinario.setCodigoPostal(normalize(veterinario.getCodigoPostal()));
         assertUniqueCodigo(c, veterinario, codigo);
 
         String dni = normalize(veterinario.getDni());

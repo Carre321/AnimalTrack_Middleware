@@ -21,7 +21,7 @@ public class GranjaDAO {
 	private static Logger logger = LogManager.getLogger(GranjaDAO.class.getName());
 
     private static final String BASE_QUERY =
-            "SELECT g.id, g.nombre, g.direccion, g.municipio_id, m.nombre, p.id, p.nombre, g.ganadero_id, " +
+            "SELECT g.id, g.nombre, g.direccion, g.codigo_postal, g.municipio_id, m.nombre, p.id, p.nombre, g.ganadero_id, " +
             "TRIM(CONCAT(COALESCE(ga.nombre,''), ' ', COALESCE(ga.apellidos,''))) " +
             "FROM granja g " +
             "INNER JOIN municipio m ON g.municipio_id = m.id " +
@@ -111,9 +111,9 @@ public class GranjaDAO {
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
-            String sql = "INSERT INTO granja (nombre, direccion, municipio_id, ganadero_id) VALUES (?, ?, ?, ?)";
+            String sql = "INSERT INTO granja (nombre, direccion, codigo_postal, municipio_id, ganadero_id) VALUES (?, ?, ?, ?, ?)";
             ps = c.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
-            DAOUtils.setParameters(ps, entity.getNombre(), entity.getDireccion(), entity.getMunicipioId(), entity.getGanaderoId());
+            DAOUtils.setParameters(ps, entity.getNombre(), entity.getDireccion(), entity.getCodigoPostal(), entity.getMunicipioId(), entity.getGanaderoId());
             ps.executeUpdate();
             rs = ps.getGeneratedKeys();
             if (rs.next()) {
@@ -132,9 +132,9 @@ public class GranjaDAO {
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
-            String sql = "UPDATE granja SET nombre = ?, direccion = ?, municipio_id = ?, ganadero_id = ? WHERE id = ?";
+            String sql = "UPDATE granja SET nombre = ?, direccion = ?, codigo_postal = ?, municipio_id = ?, ganadero_id = ? WHERE id = ?";
             ps = c.prepareStatement(sql);
-            DAOUtils.setParameters(ps, entity.getNombre(), entity.getDireccion(), entity.getMunicipioId(), entity.getGanaderoId(), entity.getId());
+            DAOUtils.setParameters(ps, entity.getNombre(), entity.getDireccion(), entity.getCodigoPostal(), entity.getMunicipioId(), entity.getGanaderoId(), entity.getId());
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
@@ -166,6 +166,7 @@ public class GranjaDAO {
         dto.setId(rs.getLong(i++));
         dto.setNombre(rs.getString(i++));
         dto.setDireccion(rs.getString(i++));
+        dto.setCodigoPostal(rs.getString(i++));
         dto.setMunicipioId(rs.getLong(i++));
         dto.setMunicipioNombre(rs.getString(i++));
         dto.setProvinciaId(rs.getLong(i++));
