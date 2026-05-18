@@ -27,7 +27,7 @@ public class EncryptionServiceBCryptImpl implements EncryptionService {
         try {
             return BCrypt.checkpw(clearData, encryptedData);
         } catch (IllegalArgumentException e) {
-            logger.warn("No se pudo comprobar la contrasena cifrada.", e);
+            logger.warn("No se pudo comprobar la contraseña cifrada.", e);
             return false;
         }
     }

@@ -22,7 +22,7 @@ public class AnimalDAO {
 
 	private static final String BASE_QUERY =
 			"SELECT a.id, a.crotal, a.nombre, a.fecha_nacimiento, a.fecha_baja, a.granja_id, g.nombre, a.sexo_id, s.nombre, " +
-					"a.raza_id, r.nombre, a.madre_interna_id, a.madre_externa_crotal, a.padre_interno_id, p.nombre, a.event_parto_id " +
+					"a.raza_id, r.nombre, a.madre_interna_id, a.madre_externa_crotal, a.padre_interno_id, p.nombre, a.event_parto_id, a.foto " +
 					"FROM animal a " +
 					"INNER JOIN granja g ON a.granja_id = g.id " +
 					"INNER JOIN sexo s ON a.sexo_id = s.id " +
@@ -167,8 +167,8 @@ public class AnimalDAO {
 
 			StringBuilder sql = new StringBuilder();
 			sql.append("INSERT INTO animal (nombre, crotal, fecha_nacimiento, fecha_baja, granja_id, raza_id, sexo_id, ");
-			sql.append("madre_interna_id, madre_externa_crotal, padre_interno_id, event_parto_id) ");
-			sql.append("VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+			sql.append("madre_interna_id, madre_externa_crotal, padre_interno_id, event_parto_id, foto) ");
+			sql.append("VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
 			ps = c.prepareStatement(sql.toString(), PreparedStatement.RETURN_GENERATED_KEYS);
 
@@ -183,7 +183,8 @@ public class AnimalDAO {
 					a.getMadreInternaId(),
 					a.getMadreExternaCrotal(),
 					a.getPadreInternoId(),
-					a.getEventPartoId());
+					a.getEventPartoId(),
+					a.getFoto());
 
 			ps.executeUpdate();
 
@@ -207,7 +208,7 @@ public class AnimalDAO {
 
 			StringBuilder sql = new StringBuilder();
 			sql.append("UPDATE animal SET nombre = ?, crotal = ?, fecha_nacimiento = ?, fecha_baja = ?, granja_id = ?, raza_id = ?, sexo_id = ?, ");
-			sql.append("madre_interna_id = ?, madre_externa_crotal = ?, padre_interno_id = ?, event_parto_id = ? ");
+			sql.append("madre_interna_id = ?, madre_externa_crotal = ?, padre_interno_id = ?, event_parto_id = ?, foto = ? ");
 			sql.append("WHERE id = ?");
 
 			ps = c.prepareStatement(sql.toString());
@@ -224,6 +225,7 @@ public class AnimalDAO {
 					a.getMadreExternaCrotal(),
 					a.getPadreInternoId(),
 					a.getEventPartoId(),
+					a.getFoto(),
 					a.getId());
 
 			return ps.executeUpdate() > 0;
@@ -279,6 +281,7 @@ public class AnimalDAO {
 		a.setPadreInternoId((Long) rs.getObject(i++));
 		a.setPadreInternoNombre(rs.getString(i++));
 		a.setEventPartoId((Long) rs.getObject(i++));
+		a.setFoto(rs.getBytes(i++));
 
 		return a;
 	}

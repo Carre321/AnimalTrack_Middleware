@@ -19,6 +19,7 @@ public class Animal extends AbstractValueObject {
 	private Long padreInternoId;
 
 	private Long eventPartoId;
+	private byte[] foto;
 
 	public Animal() {}
 
@@ -57,5 +58,8 @@ public class Animal extends AbstractValueObject {
 
 	public Long getEventPartoId() { return eventPartoId; }
 	public void setEventPartoId(Long eventPartoId) { this.eventPartoId = eventPartoId; }
+
+	public byte[] getFoto() { return foto; }
+	public void setFoto(byte[] foto) { this.foto = foto; }
 }
 

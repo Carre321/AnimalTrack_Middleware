@@ -30,6 +30,7 @@ public class AnimalDTO extends AbstractValueObject {
 	
 
 	private Long eventPartoId;
+	private byte[] foto;
 
 	public AnimalDTO() {}
 
@@ -84,6 +85,14 @@ public class AnimalDTO extends AbstractValueObject {
 
 	public void setPadreInternoNombre(String padreInternoNombre) {
 		this.padreInternoNombre = padreInternoNombre;
+	}
+
+	public byte[] getFoto() {
+		return foto;
+	}
+
+	public void setFoto(byte[] foto) {
+		this.foto = foto;
 	}
 
 }
