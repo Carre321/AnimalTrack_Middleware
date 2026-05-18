@@ -21,6 +21,7 @@ public class AnimalCriteria extends AbstractValueObject {
     private String nombreLike;
     private String orderby = ORDER_BY_NAME;
     private boolean ascDesc = true;
+    private boolean includeHistory = false;
 
     public AnimalCriteria() {
     }
@@ -112,4 +113,12 @@ public class AnimalCriteria extends AbstractValueObject {
 	public void setAscDesc(boolean ascDesc) {
 		this.ascDesc = ascDesc;
 	}
+
+    public boolean isIncludeHistory() {
+        return includeHistory;
+    }
+
+    public void setIncludeHistory(boolean includeHistory) {
+        this.includeHistory = includeHistory;
+    }
 }

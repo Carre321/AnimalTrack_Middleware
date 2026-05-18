@@ -103,6 +103,9 @@ public class AnimalDAO {
 			SQLUtils.addClause(criteria.getPadreInternoId(), condiciones, "a.padre_interno_id = ?", parametros, criteria.getPadreInternoId());
 			SQLUtils.addClause(criteria.getMadreInternaId(), condiciones, "a.madre_interna_id = ?", parametros, criteria.getMadreInternaId());
 			SQLUtils.addClause(criteria.getEventPartoId(), condiciones, "a.event_parto_id = ?", parametros, criteria.getEventPartoId());
+            if (!criteria.isIncludeHistory()) {
+                condiciones.add("a.fecha_baja IS NULL");
+            }
 
 			if (criteria.getCrotalLike() != null) {
 				SQLUtils.addClause(criteria.getCrotalLike(), condiciones, "UPPER(a.crotal) LIKE UPPER(?)", parametros, "%" + criteria.getCrotalLike() + "%");
