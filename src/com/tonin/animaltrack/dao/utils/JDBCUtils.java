@@ -41,6 +41,7 @@ public class JDBCUtils {
             addColumnIfMissing(connection, "granja", "codigo_postal", "VARCHAR(10) NULL DEFAULT NULL AFTER direccion");
             addColumnIfMissing(connection, "veterinario", "direccion", "VARCHAR(256) NULL DEFAULT NULL AFTER email");
             addColumnIfMissing(connection, "veterinario", "codigo_postal", "VARCHAR(10) NULL DEFAULT NULL AFTER direccion");
+            seedSpanishProvinces(connection);
             schemaChecked = true;
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
@@ -66,6 +67,29 @@ public class JDBCUtils {
         } finally {
             try { if (statement != null) statement.close(); } catch (Exception e) { logger.error(e.getMessage(), e); }
             close(rs, ps);
+        }
+    }
+
+    private static void seedSpanishProvinces(Connection connection) throws SQLException {
+        String[] provincias = new String[] {
+                "A Coruña", "Álava", "Albacete", "Alicante", "Almería", "Asturias", "Ávila", "Badajoz",
+                "Barcelona", "Burgos", "Cáceres", "Cádiz", "Cantabria", "Castellón", "Ciudad Real",
+                "Córdoba", "Cuenca", "Girona", "Granada", "Guadalajara", "Gipuzkoa", "Huelva", "Huesca",
+                "Illes Balears", "Jaén", "La Rioja", "Las Palmas", "León", "Lleida", "Lugo", "Madrid",
+                "Málaga", "Murcia", "Navarra", "Ourense", "Palencia", "Pontevedra", "Salamanca",
+                "Santa Cruz de Tenerife", "Segovia", "Sevilla", "Soria", "Tarragona", "Teruel", "Toledo",
+                "Valencia", "Valladolid", "Bizkaia", "Zamora", "Zaragoza"
+        };
+        PreparedStatement ps = null;
+        try {
+            ps = connection.prepareStatement("INSERT IGNORE INTO provincia (nombre) VALUES (?)");
+            for (String provincia : provincias) {
+                ps.setString(1, provincia);
+                ps.addBatch();
+            }
+            ps.executeBatch();
+        } finally {
+            close(null, ps);
         }
     }
 
