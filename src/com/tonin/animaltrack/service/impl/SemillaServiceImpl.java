@@ -7,6 +7,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.tonin.animaltrack.dao.SemillaDAO;
+import com.tonin.animaltrack.dao.criteria.SemillaCriteria;
 import com.tonin.animaltrack.dao.utils.JDBCUtils;
 import com.tonin.animaltrack.model.Semilla;
 import com.tonin.animaltrack.service.SemillaService;
@@ -58,6 +59,24 @@ public class SemillaServiceImpl implements SemillaService {
     }
 
     @Override
+    public List<Semilla> findByCriteria(SemillaCriteria criteria) throws Exception {
+        Connection c = null;
+        boolean commit = false;
+        try {
+            c = JDBCUtils.getConnection();
+            c.setAutoCommit(false);
+            List<Semilla> result = semillaDAO.findBy(c, criteria);
+            commit = true;
+            return result;
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            throw e;
+        } finally {
+            JDBCUtils.close(c, commit);
+        }
+    }
+
+    @Override
     public List<Semilla> findAll() throws Exception {
         Connection c = null;
         boolean commit = false;
@@ -82,7 +101,7 @@ public class SemillaServiceImpl implements SemillaService {
         try {
             c = JDBCUtils.getConnection();
             c.setAutoCommit(false);
-            if (semilla == null || semilla.getCodigo() == null) {
+            if (semilla == null || semilla.getCodigo() == null || semilla.getNombre() == null) {
                 commit = true;
                 return null;
             }

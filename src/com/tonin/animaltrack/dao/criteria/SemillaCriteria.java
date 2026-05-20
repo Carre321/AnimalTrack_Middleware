@@ -2,28 +2,11 @@ package com.tonin.animaltrack.dao.criteria;
 
 public class SemillaCriteria {
 
-    private Long id;
-    private String codigo;
     private String codigoLike;
-    private String descripcionLike;
+    private String nombreLike;
+    private Long razaId;
 
     public SemillaCriteria() {
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getCodigo() {
-        return codigo;
-    }
-
-    public void setCodigo(String codigo) {
-        this.codigo = codigo;
     }
 
     public String getCodigoLike() {
@@ -34,11 +17,19 @@ public class SemillaCriteria {
         this.codigoLike = codigoLike;
     }
 
-    public String getDescripcionLike() {
-        return descripcionLike;
+    public String getNombreLike() {
+        return nombreLike;
     }
 
-    public void setDescripcionLike(String descripcionLike) {
-        this.descripcionLike = descripcionLike;
+    public void setNombreLike(String nombreLike) {
+        this.nombreLike = nombreLike;
+    }
+
+    public Long getRazaId() {
+        return razaId;
+    }
+
+    public void setRazaId(Long razaId) {
+        this.razaId = razaId;
     }
 }

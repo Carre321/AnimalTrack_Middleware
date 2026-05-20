@@ -34,6 +34,16 @@ public class EventoDAO {
             "LEFT JOIN dosis d ON e.dosis_id = d.id " +
             "LEFT JOIN tratamiento t ON e.tratamiento_id = t.id ";
 
+    private static final String COUNT_QUERY =
+            "SELECT COUNT(*) " +
+            "FROM evento e " +
+            "INNER JOIN animal a ON e.animal_id = a.id " +
+            "INNER JOIN tipo_evento te ON e.tipo_evento_id = te.id " +
+            "LEFT JOIN veterinario v ON e.veterinario_id = v.id " +
+            "LEFT JOIN semilla s ON e.semilla_id = s.id " +
+            "LEFT JOIN dosis d ON e.dosis_id = d.id " +
+            "LEFT JOIN tratamiento t ON e.tratamiento_id = t.id ";
+
     public EventoDAO() {
     }
 
@@ -64,10 +74,13 @@ public class EventoDAO {
 
     public Results<EventoDTO> findBy(Connection c, EventoCriteria criteria, int from, int pageSize) throws Exception {
         PreparedStatement ps = null;
+        PreparedStatement psCount = null;
         ResultSet rs = null;
+        ResultSet rsCount = null;
         try {
 
             StringBuilder sql = new StringBuilder(BASE_QUERY);
+            StringBuilder countSql = new StringBuilder(COUNT_QUERY);
             List<String> condiciones = new ArrayList<String>();
             List<Object> parametros = new ArrayList<Object>();
 
@@ -107,14 +120,11 @@ public class EventoDAO {
             if (!condiciones.isEmpty()) {
                 sql.append(" WHERE ");
                 sql.append(String.join(" AND ", condiciones));
+                countSql.append(" WHERE ");
+                countSql.append(String.join(" AND ", condiciones));
             }
 
             sql.append(" ORDER BY e.fecha_hora DESC");
-
-            ps = c.prepareStatement(sql.toString(), ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-            DAOUtils.setParameters(ps, parametros);
-            rs = ps.executeQuery();
-            List<EventoDTO> paginaResultados = new ArrayList<EventoDTO>();
 
             if (from < 1) {
                 from = 1;
@@ -123,15 +133,27 @@ public class EventoDAO {
                 pageSize = Integer.MAX_VALUE;
             }
 
-            if (rs.absolute(from)) {
-                int count = 0;
-                do {
-                    paginaResultados.add(loadNext(rs));
-                    ++count;
-                } while (count < pageSize && rs.next());
+            sql.append(" LIMIT ? OFFSET ?");
+
+            ps = c.prepareStatement(sql.toString());
+            List<Object> pageParams = new ArrayList<Object>(parametros);
+            pageParams.add(pageSize);
+            pageParams.add(from - 1);
+            DAOUtils.setParameters(ps, pageParams);
+            rs = ps.executeQuery();
+            List<EventoDTO> paginaResultados = new ArrayList<EventoDTO>();
+
+            while (rs.next()) {
+                paginaResultados.add(loadNext(rs));
             }
 
-            int totalResults = SQLUtils.getTotalRows(rs);
+            psCount = c.prepareStatement(countSql.toString());
+            DAOUtils.setParameters(psCount, parametros);
+            rsCount = psCount.executeQuery();
+            int totalResults = 0;
+            if (rsCount.next()) {
+                totalResults = rsCount.getInt(1);
+            }
 
             Results<EventoDTO> results = new Results<EventoDTO>();
             results.setPageResults(paginaResultados);
@@ -142,6 +164,7 @@ public class EventoDAO {
             logger.error(e.getMessage(), e);
         throw e;
         } finally {
+            JDBCUtils.close(rsCount, psCount);
             JDBCUtils.close(rs, ps);
         }
     }

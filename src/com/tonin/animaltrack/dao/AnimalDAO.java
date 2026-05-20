@@ -29,6 +29,14 @@ public class AnimalDAO {
 					"LEFT JOIN raza r ON a.raza_id = r.id " +
 					"LEFT JOIN animal p ON a.padre_interno_id = p.id ";
 
+	private static final String COUNT_QUERY =
+			"SELECT COUNT(*) " +
+					"FROM animal a " +
+					"INNER JOIN granja g ON a.granja_id = g.id " +
+					"INNER JOIN sexo s ON a.sexo_id = s.id " +
+					"LEFT JOIN raza r ON a.raza_id = r.id " +
+					"LEFT JOIN animal p ON a.padre_interno_id = p.id ";
+
 	public AnimalDAO() {
 	}
 
@@ -88,10 +96,13 @@ public class AnimalDAO {
 		}
 
 		PreparedStatement ps = null;
+		PreparedStatement psCount = null;
 		ResultSet rs = null;
+		ResultSet rsCount = null;
 		try {
 
 			StringBuilder sql = new StringBuilder(BASE_QUERY);
+			StringBuilder countSql = new StringBuilder(COUNT_QUERY);
 
 			List<String> condiciones = new ArrayList<String>();
 			List<Object> parametros = new ArrayList<Object>();
@@ -117,21 +128,11 @@ public class AnimalDAO {
 			if (!condiciones.isEmpty()) {
 				sql.append(" WHERE ");
 				sql.append(String.join(" AND ", condiciones));
+				countSql.append(" WHERE ");
+				countSql.append(String.join(" AND ", condiciones));
 			}
 
 			sql.append(" ORDER BY ").append(criteria.getOrderby()).append(criteria.isAscDesc() ? " ASC " : " DESC ");
-
-			logger.info("SQL: {}", sql);
-
-			//            if (logger.isInfoEnabled()) {
-			//				logger.info("Criteria SQL: {}: {}:", criteria, sql);
-			//			}
-
-			ps = c.prepareStatement(sql.toString(), ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-			DAOUtils.setParameters(ps, parametros);
-
-			rs = ps.executeQuery();
-			List<AnimalDTO> paginaResultados = new ArrayList<AnimalDTO>();
 
 			if (from < 1) {
 				from = 1;
@@ -140,15 +141,34 @@ public class AnimalDAO {
 				pageSize = Integer.MAX_VALUE;
 			}
 
-			if (rs.absolute(from)) {
-				int count = 0;
-				do {
-					paginaResultados.add(loadNext(rs));
-					++count;
-				} while (count < pageSize && rs.next());
+			sql.append(" LIMIT ? OFFSET ? ");
+
+			logger.info("SQL: {}", sql);
+
+			//            if (logger.isInfoEnabled()) {
+			//				logger.info("Criteria SQL: {}: {}:", criteria, sql);
+			//			}
+
+			ps = c.prepareStatement(sql.toString());
+			List<Object> pageParams = new ArrayList<Object>(parametros);
+			pageParams.add(pageSize);
+			pageParams.add(from - 1);
+			DAOUtils.setParameters(ps, pageParams);
+
+			rs = ps.executeQuery();
+			List<AnimalDTO> paginaResultados = new ArrayList<AnimalDTO>();
+
+			while (rs.next()) {
+				paginaResultados.add(loadNext(rs));
 			}
-			
-			int totalResults = SQLUtils.getTotalRows(rs);
+
+			psCount = c.prepareStatement(countSql.toString());
+			DAOUtils.setParameters(psCount, parametros);
+			rsCount = psCount.executeQuery();
+			int totalResults = 0;
+			if (rsCount.next()) {
+				totalResults = rsCount.getInt(1);
+			}
 
 			Results<AnimalDTO> results = new Results<AnimalDTO>();
 			results.setPageResults(paginaResultados);
@@ -159,6 +179,7 @@ public class AnimalDAO {
 			logger.error(e.getMessage()+ ":" +criteria, e);
 			throw e;
 		} finally {
+			JDBCUtils.close(rsCount, psCount);
 			JDBCUtils.close(rs, ps);
 		}
 	}

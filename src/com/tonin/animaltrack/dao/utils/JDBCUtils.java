@@ -5,7 +5,6 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -13,85 +12,20 @@ import org.apache.logging.log4j.Logger;
 public class JDBCUtils {
 
 	private static Logger logger = LogManager.getLogger(JDBCUtils.class.getName());
-    private static boolean schemaChecked = false;
-	
+
 	public static Connection getConnection() {
 		try {
 			Class.forName("com.mysql.cj.jdbc.Driver");
-			Connection connection = DriverManager.getConnection(
+			return DriverManager.getConnection(
 					"jdbc:mysql://localhost:3306/animaltrackesp",
 					"root",
 					"abc123."
 			);
-            ensureSchema(connection);
-            return connection;
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}
 		return null;
 	}
-
-    private static synchronized void ensureSchema(Connection connection) {
-        if (schemaChecked || connection == null) {
-            return;
-        }
-        try {
-            addColumnIfMissing(connection, "ganadero", "direccion", "VARCHAR(256) NULL DEFAULT NULL AFTER email");
-            addColumnIfMissing(connection, "ganadero", "codigo_postal", "VARCHAR(10) NULL DEFAULT NULL AFTER direccion");
-            addColumnIfMissing(connection, "granja", "codigo_postal", "VARCHAR(10) NULL DEFAULT NULL AFTER direccion");
-            addColumnIfMissing(connection, "veterinario", "direccion", "VARCHAR(256) NULL DEFAULT NULL AFTER email");
-            addColumnIfMissing(connection, "veterinario", "codigo_postal", "VARCHAR(10) NULL DEFAULT NULL AFTER direccion");
-            seedSpanishProvinces(connection);
-            schemaChecked = true;
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-        }
-    }
-
-    private static void addColumnIfMissing(Connection connection, String table, String column, String definition)
-            throws SQLException {
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        Statement statement = null;
-        try {
-            ps = connection.prepareStatement(
-                    "SELECT 1 FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = ? AND column_name = ?");
-            ps.setString(1, table);
-            ps.setString(2, column);
-            rs = ps.executeQuery();
-            if (rs.next()) {
-                return;
-            }
-            statement = connection.createStatement();
-            statement.executeUpdate("ALTER TABLE " + table + " ADD COLUMN " + column + " " + definition);
-        } finally {
-            try { if (statement != null) statement.close(); } catch (Exception e) { logger.error(e.getMessage(), e); }
-            close(rs, ps);
-        }
-    }
-
-    private static void seedSpanishProvinces(Connection connection) throws SQLException {
-        String[] provincias = new String[] {
-                "A Coruña", "Álava", "Albacete", "Alicante", "Almería", "Asturias", "Ávila", "Badajoz",
-                "Barcelona", "Burgos", "Cáceres", "Cádiz", "Cantabria", "Castellón", "Ciudad Real",
-                "Córdoba", "Cuenca", "Girona", "Granada", "Guadalajara", "Gipuzkoa", "Huelva", "Huesca",
-                "Illes Balears", "Jaén", "La Rioja", "Las Palmas", "León", "Lleida", "Lugo", "Madrid",
-                "Málaga", "Murcia", "Navarra", "Ourense", "Palencia", "Pontevedra", "Salamanca",
-                "Santa Cruz de Tenerife", "Segovia", "Sevilla", "Soria", "Tarragona", "Teruel", "Toledo",
-                "Valencia", "Valladolid", "Bizkaia", "Zamora", "Zaragoza"
-        };
-        PreparedStatement ps = null;
-        try {
-            ps = connection.prepareStatement("INSERT IGNORE INTO provincia (nombre) VALUES (?)");
-            for (String provincia : provincias) {
-                ps.setString(1, provincia);
-                ps.addBatch();
-            }
-            ps.executeBatch();
-        } finally {
-            close(null, ps);
-        }
-    }
 
 	public static void close(ResultSet rs, PreparedStatement ps) {
 		try { if (rs != null) rs.close(); } catch (Exception e) { logger.error(e.getMessage(), e); }
