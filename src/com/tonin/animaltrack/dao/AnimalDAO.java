@@ -21,7 +21,7 @@ public class AnimalDAO {
 	private static Logger logger = LogManager.getLogger(AnimalDAO.class.getName());
 
 	private static final String BASE_QUERY =
-			"SELECT a.id, a.crotal, a.nombre, a.fecha_nacimiento, a.fecha_baja, a.granja_id, g.nombre, a.sexo_id, s.nombre, " +
+			"SELECT a.id, a.crotal, a.nombre, a.fecha_nacimiento, a.fecha_baja, a.granja_id, g.rega, g.nombre, a.sexo_id, s.nombre, " +
 					"a.raza_id, r.nombre, a.madre_interna_id, a.madre_externa_crotal, a.padre_interno_id, p.nombre, a.event_parto_id, a.foto " +
 					"FROM animal a " +
 					"INNER JOIN granja g ON a.granja_id = g.id " +
@@ -292,6 +292,7 @@ public class AnimalDAO {
 		a.setFechaBaja(rs.getDate(i++));
 
 		a.setGranjaId(rs.getLong(i++));
+		a.setGranjaRega(rs.getString(i++));
 		a.setGranjaNombre(rs.getString(i++));
 
 		a.setSexoId(rs.getLong(i++));

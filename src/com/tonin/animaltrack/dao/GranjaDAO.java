@@ -21,12 +21,12 @@ public class GranjaDAO {
 	private static Logger logger = LogManager.getLogger(GranjaDAO.class.getName());
 
     private static final String BASE_QUERY =
-            "SELECT g.id, g.nombre, g.direccion, g.codigo_postal, g.municipio_id, m.nombre, p.id, p.nombre, g.ganadero_id, " +
+            "SELECT g.id, g.rega, g.nombre, g.direccion, g.codigo_postal, g.municipio_id, m.nombre, p.id, p.nombre, g.ganadero_id, " +
             "TRIM(CONCAT(COALESCE(ga.nombre,''), ' ', COALESCE(ga.apellidos,''))) " +
             "FROM granja g " +
             "INNER JOIN municipio m ON g.municipio_id = m.id " +
             "INNER JOIN provincia p ON m.provincia_id = p.id " +
-            "INNER JOIN ganadero ga ON g.ganadero_id = ga.id ";
+            "LEFT JOIN ganadero ga ON g.ganadero_id = ga.id ";
 
     public GranjaDAO() {
     }
@@ -61,6 +61,7 @@ public class GranjaDAO {
             List<Object> parametros = new ArrayList<Object>();
 
             SQLUtils.addClause(criteria.getId(), condiciones, "g.id = ?", parametros, criteria.getId());
+            SQLUtils.addClause(criteria.getRega(), condiciones, "g.rega = ?", parametros, criteria.getRega());
             SQLUtils.addClause(criteria.getNombre(), condiciones, "g.nombre = ?", parametros, criteria.getNombre());
             SQLUtils.addClause(criteria.getMunicipioId(), condiciones, "g.municipio_id = ?", parametros, criteria.getMunicipioId());
             SQLUtils.addClause(criteria.getGanaderoId(), condiciones, "g.ganadero_id = ?", parametros, criteria.getGanaderoId());
@@ -111,9 +112,9 @@ public class GranjaDAO {
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
-            String sql = "INSERT INTO granja (nombre, direccion, codigo_postal, municipio_id, ganadero_id) VALUES (?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO granja (rega, nombre, direccion, codigo_postal, municipio_id, ganadero_id) VALUES (?, ?, ?, ?, ?, ?)";
             ps = c.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
-            DAOUtils.setParameters(ps, entity.getNombre(), entity.getDireccion(), entity.getCodigoPostal(), entity.getMunicipioId(), entity.getGanaderoId());
+            DAOUtils.setParameters(ps, entity.getRega(), entity.getNombre(), entity.getDireccion(), entity.getCodigoPostal(), entity.getMunicipioId(), entity.getGanaderoId());
             ps.executeUpdate();
             rs = ps.getGeneratedKeys();
             if (rs.next()) {
@@ -132,9 +133,9 @@ public class GranjaDAO {
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
-            String sql = "UPDATE granja SET nombre = ?, direccion = ?, codigo_postal = ?, municipio_id = ?, ganadero_id = ? WHERE id = ?";
+            String sql = "UPDATE granja SET rega = ?, nombre = ?, direccion = ?, codigo_postal = ?, municipio_id = ?, ganadero_id = ? WHERE id = ?";
             ps = c.prepareStatement(sql);
-            DAOUtils.setParameters(ps, entity.getNombre(), entity.getDireccion(), entity.getCodigoPostal(), entity.getMunicipioId(), entity.getGanaderoId(), entity.getId());
+            DAOUtils.setParameters(ps, entity.getRega(), entity.getNombre(), entity.getDireccion(), entity.getCodigoPostal(), entity.getMunicipioId(), entity.getGanaderoId(), entity.getId());
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
@@ -164,6 +165,7 @@ public class GranjaDAO {
         int i = 1;
         GranjaDTO dto = new GranjaDTO();
         dto.setId(rs.getLong(i++));
+        dto.setRega(rs.getString(i++));
         dto.setNombre(rs.getString(i++));
         dto.setDireccion(rs.getString(i++));
         dto.setCodigoPostal(rs.getString(i++));
@@ -171,7 +173,8 @@ public class GranjaDAO {
         dto.setMunicipioNombre(rs.getString(i++));
         dto.setProvinciaId(rs.getLong(i++));
         dto.setProvinciaNombre(rs.getString(i++));
-        dto.setGanaderoId(rs.getLong(i++));
+        Object ganaderoId = rs.getObject(i++);
+        dto.setGanaderoId(ganaderoId == null ? null : ((Number) ganaderoId).longValue());
         dto.setGanaderoNombreCompleto(rs.getString(i++));
         return dto;
     }

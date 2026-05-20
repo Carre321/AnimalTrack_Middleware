@@ -157,10 +157,11 @@ public class GranjaServiceImpl implements GranjaService {
     }
 
     private void validateForSave(Granja granja) {
-        if (granja == null || isBlank(granja.getNombre()) || isBlank(granja.getDireccion())
-        || granja.getMunicipioId() == null || granja.getGanaderoId() == null) {
+        if (granja == null || isBlank(granja.getRega()) || isBlank(granja.getNombre()) || isBlank(granja.getDireccion())
+        || granja.getMunicipioId() == null) {
             throw new IllegalArgumentException(REQUIRED_DATA_MESSAGE);
         }
+        granja.setRega(granja.getRega().trim());
         granja.setNombre(granja.getNombre().trim());
         granja.setDireccion(granja.getDireccion().trim());
         granja.setCodigoPostal(normalize(granja.getCodigoPostal()));

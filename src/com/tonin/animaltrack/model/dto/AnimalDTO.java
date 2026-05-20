@@ -13,6 +13,7 @@ public class AnimalDTO extends AbstractValueObject {
 	private Date fechaBaja;
 
 	private Long granjaId;
+	private String granjaRega;
 	private String granjaNombre;
 
 	private Long sexoId;
@@ -51,6 +52,9 @@ public class AnimalDTO extends AbstractValueObject {
 
 	public Long getGranjaId() { return granjaId; }
 	public void setGranjaId(Long granjaId) { this.granjaId = granjaId; }
+
+	public String getGranjaRega() { return granjaRega; }
+	public void setGranjaRega(String granjaRega) { this.granjaRega = granjaRega; }
 
 	public String getGranjaNombre() { return granjaNombre; }
 	public void setGranjaNombre(String granjaNombre) { this.granjaNombre = granjaNombre; }

@@ -3,6 +3,7 @@ package com.tonin.animaltrack.model;
 public class Granja extends AbstractValueObject {
 
     private Long id;
+    private String rega;
     private String nombre;
     private String direccion;
     private String codigoPostal;
@@ -18,6 +19,14 @@ public class Granja extends AbstractValueObject {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getRega() {
+        return rega;
+    }
+
+    public void setRega(String rega) {
+        this.rega = rega;
     }
 
     public String getNombre() {
